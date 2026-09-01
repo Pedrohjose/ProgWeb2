@@ -10,4 +10,6 @@ Para rodar o projeto precisa de:<br>
 * Apos concluir os passos anteriores para rodar o projeto, basta pelo terminal, acessar a pasta do projeto, e executar o comando:
   * npm run dev
   
-# E assim ele ira iniciar o projeto
+## E assim ele ira iniciar o projeto
+
+**[Documentação Tillwind](https://tailwindcss.com/plus/ui-blocks?ref=sidebar)**
