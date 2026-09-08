@@ -1,9 +1,14 @@
 import './style.css'
 
-const btnSignIn = document.getElementById("btnSignIn");
+const form = document.getElementById("form");
 
-btnSignIn.addEventListener("click", function () {
-  // COLOCAR A VALIDACAO COM O BANCO EM PY
+form.addEventListener("submit", function (event) {
+  event.preventDefault();
+
+  const inputLogin = document.getElementById("email").value;
+  const inputSenha = document.getElementById("password").value;
+  if (inputLogin == "carlos@estok.com" && inputSenha == "senha") {
+    alert("LOGOU")
+    window.location.replace("http://localhost:5173/home.html");
+  }
 })
-
-console.log("TA INDO");
