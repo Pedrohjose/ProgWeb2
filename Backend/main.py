@@ -1,10 +1,10 @@
 from fastapi import FastAPI, HTTPException
 from usuario import Usuario, usuario_router
 from pydantic import BaseModel
+from banco import conectar
 
 app = FastAPI()
 app.include_router(usuario_router)
-# Incluir Demais API's
 
 class Login(BaseModel):
     email: str
@@ -12,26 +12,28 @@ class Login(BaseModel):
 
 @app.post("/login")
 def logar(dados: Login):
+    conexao = conectar()
+    cursor = conexao.cursor(dictionary=True)
 
-    #Procurar o login no banco
-    print(dados.email)
-    print(dados.senha)
+    sql = """
+        SELECT id, nome, email, senha, perfil
+        FROM usuarios
+        WHERE email = %s AND senha = %s"""
 
-    if dados.email == "carlos@estok.com" and dados.senha == "senha":
-        return {
-            "mensagem": "Login realizado com sucesso",
-            "usuario": {
-                "id": 1,
-                "nome": "Carlao",
-                "email": "carlosestok.com",
-                "perfil": "Admin Global"
-            }
-        }
+    cursor.execute(sql, (dados.email, dados.senha))
 
-    raise HTTPException(
-        status_code=401,
-        detail="Email ou senha inválidos"
-    )
+    usuario = cursor.fetchone()
 
-usuario = Usuario("Carlos", "carlos@gmail.com", "123", "Global")
-usuario.adicinarUsuario()
+    cursor.close()
+    conexao.close()
+
+    if usuario is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Email ou senha inválidos"
+        )
+
+    return {
+        "messagem": "Login realizado com sucesso",
+        "usuario": usuario
+    } 
