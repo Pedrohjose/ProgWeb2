@@ -52,3 +52,22 @@ Telas feitas:
 ## E assim ele ira iniciar o projeto
 
 **[Documentação Tillwind](https://tailwindcss.com/plus/ui-blocks?ref=sidebar)**
+
+## Como usar o migrations
+
+Fazer o clone ou o pull do repositorio, e instalar o mySQL.
+
+Então criar uma conexão com o seguinte usuarios:
+  * Usuario: root
+  * Senha: Senha=2709!
+
+Caso não tenho o banco criado, criar um banco de dados chamado estok com o comando:
+  * CREATE DATABASE estok
+
+Apos isso entrar na pasta do projeto entrar na pasta /Backend. No meu pc o caminho completo fica
+
+ * C:\Users\Carlos\Desktop\Faculdade\ProgWeb2\Backend
+
+Então ja dentro da pasta para sincronizar o banco basta executar o comando abaixo DENTRO da pasta acima
+
+ * alembic upgrade head
