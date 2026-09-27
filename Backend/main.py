@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from usuario import Usuario, usuario_router
+from models import Usuario, usuario_router
 from pydantic import BaseModel
 from banco import conectar
 
