@@ -28,7 +28,7 @@ class Usuario(Base):
         cascade="all, delete"
     )
 
-class Usuario(BaseModel):
+class UsuarioEntradaCarlos(BaseModel):
     nome: str
     email: str
     senha: str
@@ -43,7 +43,7 @@ class Usuario(BaseModel):
         self.status = True
 
 @usuario_router.post("/usuarios")
-def adicinarUsuario(usuario: Usuario):
+def adicinarUsuario(usuario: UsuarioEntradaCarlos):
     global id
 
     id += 1
@@ -62,7 +62,7 @@ def adicinarUsuario(usuario: Usuario):
     }
 
 @usuario_router.put("PUT /usuarios/{id}")
-def atualizar_usuario(id: int, usuario: Usuario):
+def atualizar_usuario(id: int, usuario: UsuarioEntradaCarlos):
 
     print("ID:", id)
     print("Nome:", usuario.nome)
