@@ -1,10 +1,12 @@
 from fastapi import FastAPI, HTTPException
-from models import Usuario, usuario_router
+from models.usuario import usuario_router
+from pedro_api import incluir_rotas
 from pydantic import BaseModel
 from banco import conectar
 
 app = FastAPI()
 app.include_router(usuario_router)
+incluir_rotas(app)
 
 class Login(BaseModel):
     email: str
