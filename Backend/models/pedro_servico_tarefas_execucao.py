@@ -3,13 +3,13 @@ from datetime import date
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from pedro_api.erros import Conflito, NaoEncontrado
+from models.pedro_erros import Conflito, NaoEncontrado
 from models.item import Item
 from models.item_tarefa import ItensTarefa
 from models.tarefa import Tarefa
-from pedro_api.repositories import itens as repo_itens
-from pedro_api.repositories import tarefas as repo_tarefas
-from pedro_api.schemas import EstadoTarefa, ItemTarefaSaida, ProgressoTarefa
+from models import pedro_repo_itens as repo_itens
+from models import pedro_repo_tarefas as repo_tarefas
+from models.pedro_schemas import EstadoTarefa, ItemTarefaSaida, ProgressoTarefa
 
 
 def _tarefa(db: Session, tarefa_id: int) -> Tarefa:

@@ -2,7 +2,7 @@
 
 from fastapi import FastAPI
 
-from pedro_api import incluir_rotas
+from models.pedro_api import incluir_rotas
 
 
 app = FastAPI(title="ESTOK API - Pedro", version="1.0.0")

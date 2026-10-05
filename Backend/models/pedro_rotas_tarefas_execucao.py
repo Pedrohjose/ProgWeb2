@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.orm import Session
 
-from pedro_api.db import get_db
-from pedro_api.schemas import Erro, EstadoTarefa, ItemTarefaSaida, ProgressoTarefa
-from pedro_api.services import tarefas_execucao as tarefas
+from models.pedro_db import get_db
+from models.pedro_schemas import Erro, EstadoTarefa, ItemTarefaSaida, ProgressoTarefa
+from models import pedro_servico_tarefas_execucao as tarefas
 
 router = APIRouter(prefix="/tarefas")
 

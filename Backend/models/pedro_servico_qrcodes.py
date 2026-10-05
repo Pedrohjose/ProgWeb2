@@ -4,10 +4,10 @@ from urllib.parse import quote
 import qrcode
 from sqlalchemy.orm import Session
 
-from pedro_api.erros import NaoEncontrado
-from pedro_api.repositories import itens as repo
-from pedro_api.schemas import QRCodeSaida
-from pedro_api.services import itens
+from models.pedro_erros import NaoEncontrado
+from models import pedro_repo_itens as repo
+from models.pedro_schemas import QRCodeSaida
+from models import pedro_servico_itens as itens
 
 
 def imagem_do_item(db: Session, item_id: int) -> bytes:

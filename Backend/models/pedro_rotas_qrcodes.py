@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from pedro_api.db import get_db
-from pedro_api.respostas import PNGResponse
-from pedro_api.schemas import Erro, QRCodeSaida
-from pedro_api.services import qrcodes
+from models.pedro_db import get_db
+from models.pedro_respostas import PNGResponse
+from models.pedro_schemas import Erro, QRCodeSaida
+from models import pedro_servico_qrcodes as qrcodes
 
 router = APIRouter(prefix="/qrcode", tags=["QR Code"])
 

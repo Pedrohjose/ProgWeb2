@@ -1,10 +1,10 @@
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from pedro_api.erros import Conflito, NaoEncontrado
+from models.pedro_erros import Conflito, NaoEncontrado
 from models.item import Item
-from pedro_api.repositories import itens as repo
-from pedro_api.schemas import ItemEntrada
+from models import pedro_repo_itens as repo
+from models.pedro_schemas import ItemEntrada
 
 
 def listar(db: Session) -> list[Item]:

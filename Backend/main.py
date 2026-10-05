@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from models.usuario import usuario_router
-from pedro_api import incluir_rotas
+from models.pedro_api import incluir_rotas
 from pydantic import BaseModel
 from banco import conectar
 
