@@ -7,6 +7,7 @@ from banco import get_db
 from models import Item, Localizacao
 from schemas import ItemSaida, LocalizacaoEntrada, LocalizacaoSaida, QrCodeItem, respostas
 
+
 router = APIRouter(prefix="/localizacoes", tags=["Localizações"])
 
 

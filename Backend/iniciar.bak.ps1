@@ -2,7 +2,7 @@ $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
 $python = Join-Path $PSScriptRoot "..\.venv\Scripts\python.exe"
 if (-not (Test-Path $python)) {
-    py -3.13 -m venv (Join-Path $PSScriptRoot "..\.venv")
+    python -m venv (Join-Path $PSScriptRoot "..\.venv")
     if ($LASTEXITCODE -ne 0) { throw "Falha criando ambiente Python." }
 }
 & $python -m pip install -r requirements.txt

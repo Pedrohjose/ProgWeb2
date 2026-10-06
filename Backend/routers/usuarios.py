@@ -6,6 +6,7 @@ from banco import get_db
 from models import Tarefa, Usuario
 from schemas import SENHA_HASH, TarefaSaida, UsuarioEntrada, UsuarioSaida, respostas
 from seguranca import hash_senha
+from fastapi import APIRouter
 
 router = APIRouter(prefix="/usuarios", tags=["Usuários"])
 

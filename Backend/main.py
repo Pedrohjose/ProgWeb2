@@ -5,6 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from banco import get_db
 from routers import auth, localizacoes, tarefas_gestao, usuarios
+from models.pedro_api import incluir_rotas
 from schemas import Saude, respostas
 
 DESCRICAO = """
@@ -38,6 +39,7 @@ app = FastAPI(
     ],
     swagger_ui_parameters={"docExpansion": "list", "displayRequestDuration": True},
 )
+incluir_rotas(app)
 
 
 @app.exception_handler(SQLAlchemyError)
