@@ -1,10 +1,7 @@
 import os
-
-import mysql.connector
 from sqlalchemy import create_engine
 from sqlalchemy.engine import URL
 from sqlalchemy.orm import declarative_base, sessionmaker
-
 
 DB_NAME = os.getenv("DB_NAME", "estok")
 
@@ -29,12 +26,9 @@ def conectar():
         database=DB_NAME,
     )
 
-
 engine = create_engine(database_url(), pool_pre_ping=True)
 SessionLocal = sessionmaker(bind=engine)
 Base = declarative_base()
-
-
 def get_db():
     with SessionLocal() as session:
         yield session

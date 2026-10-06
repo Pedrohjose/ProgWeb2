@@ -40,7 +40,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Falha ao acessar o banco estok ou a tabela Itens.' }
 
     Write-Host 'Swagger: http://127.0.0.1:8000/docs'
-    & $python -m uvicorn pedro_main:app --host 127.0.0.1 --port 8000
+    & $python -m uvicorn main:app --host 127.0.0.1 --port 8000
 } finally {
     Remove-Item Env:DB_PASSWORD -ErrorAction SilentlyContinue
 }

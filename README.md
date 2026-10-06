@@ -3,6 +3,16 @@ Trabalho de programação Web 2
 
 Sistema de gerenciamento de patrimonio, que gera etiquetas QrCode e possibilita a conferencia de material por meio de tasks
 
+## INICIAR PROJETO BACKEND COMPLETO
+
+Abrir o powershell, e entrar no Diretorio do Projeto, e rodar o arquivo powershell
+
+  * \Backend\iniciar_pedro.ps1
+
+Ele ira subir o o banco e a API, e instalar as dependencias necessarias para o projeto funcionar
+
+## Documentacao FrontEnd
+
 Para rodar o projeto precisa de:<br>
 * Node.js<br>
 * Instalar o Tailwind CSS no projeto pelo Node.js <br>

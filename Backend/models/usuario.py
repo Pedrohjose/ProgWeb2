@@ -1,9 +1,9 @@
-from fastapi import APIRouter
-from pydantic import BaseModel
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 from enum import Enum
 from banco import Base
+from fastapi import APIRouter
+from pydantic import BaseModel
 
 usuario_router = APIRouter()
 id = 0;

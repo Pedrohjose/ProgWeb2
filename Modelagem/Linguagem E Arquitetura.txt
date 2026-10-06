@@ -1,0 +1,19 @@
+ Linguagem E Arquitetura
+
+Para o desenvolvimento do backend do sistema, foi escolhida a linguagem Python, utilizando o framework FastAPI para a construção da API.
+
+A arquitetura definida será uma arquitetura em camadas, separando as principais responsabilidades do sistema, como rotas da API, regras de negócio, acesso aos dados e comunicação com o banco de dados. Essa organização facilita a manutenção do projeto, o trabalho em equipe e a implementação de novas funcionalidades.
+
+A escolha do Python foi feita principalmente pela simplicidade da linguagem, facilidade de leitura e manutenção do código e pela grande quantidade de bibliotecas e frameworks disponíveis para desenvolvimento backend.
+
+O FastAPI foi escolhido por permitir a criação de APIs de forma simples e organizada, além de oferecer recursos de validação de dados e documentação automática dos endpoints.
+
+Para a persistência dos dados, o sistema utilizará um banco de dados relacional MySQL, com integração ao backend por meio do SQLAlchemy. Dessa forma, o backend poderá realizar operações como cadastro, consulta, atualização e exclusão de produtos, usuários, inventários e demais informações do sistema.
+
+Essa arquitetura também facilita futuras integrações com tecnologias utilizadas no controle de estoque, como QR Code, código de barras ou RFID, permitindo que novas funcionalidades sejam adicionadas sem a necessidade de reorganizar toda a estrutura do sistema.
+
+De forma simplificada, a arquitetura será:
+
+Frontend → API REST com FastAPI → Regras de negócio em Python → SQLAlchemy → MySQL
+
+Essa estrutura foi escolhida por ser simples, organizada, escalável e adequada para o desenvolvimento e evolução do sistema de gerenciamento de estoque.
