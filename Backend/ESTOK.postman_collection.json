@@ -1,8 +1,8 @@
 {
   "info": {
-    "name": "ESTOK — João e Felipe — validação inicial",
+    "name": "ESTOK — Testes da API",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Executar na ordem em banco de desenvolvimento. Cria um usuario por execucao; nao cobre os 20 endpoints."
+    "description": "Validação dos seis endpoints implementados (itens 1 e 8–12 da lista original), mais diagnóstico. Execute na ordem no Collection Runner. Um usuário exclusivo é criado e excluído ao final; não use dados reais. As demais 14 rotas do escopo ainda estão pendentes."
   },
   "variable": [
     {
@@ -15,12 +15,12 @@
     },
     {
       "key": "usuario_id",
-      "value": ""
+      "value": "-1"
     }
   ],
   "item": [
     {
-      "name": "01 API ativa",
+      "name": "01 — API disponível",
       "request": {
         "method": "GET",
         "header": [],
@@ -39,7 +39,7 @@
       ]
     },
     {
-      "name": "02 Conexao MySQL",
+      "name": "02 — Banco conectado",
       "request": {
         "method": "GET",
         "header": [],
@@ -58,7 +58,7 @@
       ]
     },
     {
-      "name": "03 Cadastro",
+      "name": "03 — Cadastrar usuário",
       "request": {
         "method": "POST",
         "header": [
@@ -70,33 +70,40 @@
         "url": "{{base_url}}/usuarios",
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"nome\": \"Usuario de teste\",\n  \"email\": \"{{email_teste}}\",\n  \"senha\": \"TesteLocal123!\",\n  \"perfil\": \"Funcionario\"\n}"
+          "raw": "{\n  \"nome\": \"Usuário de Teste\",\n  \"email\": \"{{email_teste}}\",\n  \"senha\": \"TesteLocal123!\",\n  \"perfil\": \"Funcionario\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
         }
       },
       "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.set(\"usuario_id\", \"-1\");",
+              "pm.collectionVariables.set(\"email_teste\", \"estok.\" + pm.variables.replaceIn(\"{{$guid}}\") + \"@example.com\");"
+            ]
+          }
+        },
         {
           "listen": "test",
           "script": {
             "type": "text/javascript",
             "exec": [
               "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
-              "if(pm.response.code===201){pm.collectionVariables.set(\"usuario_id\",pm.response.json().id);} pm.test(\"Sem senha na resposta\",()=>pm.expect(pm.response.json()).not.to.have.property(\"senha\"));"
-            ]
-          }
-        },
-        {
-          "listen": "prerequest",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.collectionVariables.set(\"email_teste\", \"teste.\"+pm.variables.replaceIn(\"{{$guid}}\")+\"@example.com\");"
+              "pm.test(\"Resposta sem senha\", function () { pm.expect(pm.response.json()).not.to.have.property(\"senha\"); });",
+              "if(pm.response.code === 201) { pm.collectionVariables.set(\"usuario_id\", pm.response.json().id); }"
             ]
           }
         }
       ]
     },
     {
-      "name": "04 Email duplicado",
+      "name": "04 — Rejeitar email duplicado",
       "request": {
         "method": "POST",
         "header": [
@@ -108,7 +115,12 @@
         "url": "{{base_url}}/usuarios",
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"nome\": \"Usuario de teste\",\n  \"email\": \"{{email_teste}}\",\n  \"senha\": \"TesteLocal123!\",\n  \"perfil\": \"Funcionario\"\n}"
+          "raw": "{\n  \"nome\": \"Usuário de Teste\",\n  \"email\": \"{{email_teste}}\",\n  \"senha\": \"TesteLocal123!\",\n  \"perfil\": \"Funcionario\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
         }
       },
       "event": [
@@ -124,7 +136,7 @@
       ]
     },
     {
-      "name": "05 Login valido",
+      "name": "05 — Login válido",
       "request": {
         "method": "POST",
         "header": [
@@ -136,7 +148,12 @@
         "url": "{{base_url}}/login",
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"email\": \"{{email_teste}}\",\n  \"senha\": \"TesteLocal123!\"\n}"
+          "raw": "{\n  \"email\": \"{{email_teste}}\",\n  \"senha\": \"TesteLocal123!\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
         }
       },
       "event": [
@@ -145,14 +162,15 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });"
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Login não expõe senha\", function () { pm.expect(pm.response.json().usuario).not.to.have.property(\"senha\"); });"
             ]
           }
         }
       ]
     },
     {
-      "name": "06 Senha incorreta",
+      "name": "06 — Rejeitar senha incorreta",
       "request": {
         "method": "POST",
         "header": [
@@ -164,7 +182,12 @@
         "url": "{{base_url}}/login",
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"email\": \"{{email_teste}}\",\n  \"senha\": \"errada\"\n}"
+          "raw": "{\n  \"email\": \"{{email_teste}}\",\n  \"senha\": \"incorreta\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
         }
       },
       "event": [
@@ -180,7 +203,48 @@
       ]
     },
     {
-      "name": "07 Atualizar usuario",
+      "name": "07 — Listar usuários",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/usuarios/all"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Usuário criado consta na lista\", function () { const users = pm.response.json(); pm.expect(users.some(u => u.id === Number(pm.collectionVariables.get(\"usuario_id\")))).to.equal(true); users.forEach(u => pm.expect(u).not.to.have.property(\"senha\")); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 — Consultar usuário por ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/usuarios/{{usuario_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Resposta sem senha\", function () { pm.expect(pm.response.json()).not.to.have.property(\"senha\"); });",
+              "pm.test(\"ID corresponde ao cadastro\", function () { pm.expect(pm.response.json().id).to.equal(Number(pm.collectionVariables.get(\"usuario_id\"))); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 — Atualizar usuário",
       "request": {
         "method": "PUT",
         "header": [
@@ -192,7 +256,12 @@
         "url": "{{base_url}}/usuarios/{{usuario_id}}",
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"nome\": \"Usuario atualizado\",\n  \"email\": \"{{email_teste}}\",\n  \"senha\": \"TesteLocal123!\",\n  \"perfil\": \"Funcionario\"\n}"
+          "raw": "{\n  \"nome\": \"Usuário Atualizado\",\n  \"email\": \"{{email_teste}}\",\n  \"senha\": \"TesteLocal123!\",\n  \"perfil\": \"Funcionario\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
         }
       },
       "event": [
@@ -201,27 +270,72 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });"
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Resposta sem senha\", function () { pm.expect(pm.response.json()).not.to.have.property(\"senha\"); });"
             ]
           }
         }
       ]
     },
     {
-      "name": "08 Usuario inexistente",
+      "name": "10 — Conferir atualização salva",
       "request": {
-        "method": "PUT",
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/usuarios/{{usuario_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Nome atualizado persistiu\", function () { pm.expect(pm.response.json().nome).to.equal(\"Usuário Atualizado\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 — Rejeitar dados inválidos",
+      "request": {
+        "method": "POST",
         "header": [
           {
             "key": "Content-Type",
             "value": "application/json"
           }
         ],
-        "url": "{{base_url}}/usuarios/-1",
+        "url": "{{base_url}}/usuarios",
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"nome\": \"Usuario de teste\",\n  \"email\": \"{{email_teste}}\",\n  \"senha\": \"TesteLocal123!\",\n  \"perfil\": \"Funcionario\"\n}"
+          "raw": "{\n  \"nome\": \"\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
         }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 422\", function () { pm.response.to.have.status(422); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 — Consultar ID inexistente",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/usuarios/-1"
       },
       "event": [
         {
@@ -236,20 +350,11 @@
       ]
     },
     {
-      "name": "09 Dados invalidos",
+      "name": "13 — Rejeitar ID não inteiro",
       "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "url": "{{base_url}}/usuarios",
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"nome\": \"\"\n}"
-        }
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/usuarios/abc"
       },
       "event": [
         {
@@ -258,6 +363,64 @@
             "type": "text/javascript",
             "exec": [
               "pm.test(\"HTTP 422\", function () { pm.response.to.have.status(422); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "14 — Excluir usuário de teste",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{base_url}}/usuarios/{{usuario_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 204\", function () { pm.response.to.have.status(204); });",
+              "pm.test(\"Exclusão sem conteúdo\", function () { pm.expect(pm.response.text()).to.equal(\"\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "15 — Confirmar exclusão",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/usuarios/{{usuario_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "16 — Repetir exclusão",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{base_url}}/usuarios/{{usuario_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });"
             ]
           }
         }
