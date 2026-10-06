@@ -27,8 +27,3 @@ dist-ssr
 __pycache__/
 *.py[cod]
 .env
-
-.venv/
-__pycache__/
-*.py[cod]
-.env

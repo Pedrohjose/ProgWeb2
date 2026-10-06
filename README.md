@@ -1,28 +1,73 @@
 # ESTOK
+Trabalho de programação Web 2
 
-Projeto de Programação Web 2: sistema de gerenciamento de patrimônio, com cadastro de usuários, itens, localizações e tarefas de conferência.
+Sistema de gerenciamento de patrimonio, que gera etiquetas QrCode e possibilita a conferencia de material por meio de tasks
 
-## API e documentação
+Para rodar o projeto precisa de:<br>
+* Node.js<br>
+* Instalar o Tailwind CSS no projeto pelo Node.js <br>
+  * Usando o comando a seguir DENTRO da pasta do projeto:<br> npm install tailwindcss @tailwindcss/vite
+* Apos concluir os passos anteriores para rodar o projeto, basta pelo terminal, acessar a pasta do projeto, e executar o comando:
+  * npm run dev
 
-A API oferece os **20 endpoints do escopo de autenticação, usuários, tarefas e localizações**, organizados em `Backend/routers/`. Há também duas rotas auxiliares de diagnóstico.
+Telas feitas: 
+  - [x] POST /login
+  - [x] GET /itens/{all}
+  - [x] GET /itens/{id}
+  - [x] POST /itens
+  - [x] PUT /itens/{id}
+  - [x] DELETE /itens/{id}
+  - [x] GET /itens/{id}/qrcode
+  - [x] POST /itens/{id}/qrcode
+  - [x] GET /qrcode/{codigo}
+  - [x] GET /qrcode/{all}
+  - [x] GET /tarefas/{all}
+  - [x] GET /tarefas/{id}
+  - [x] POST /tarefas
+  - [x] PUT /tarefas/{id}
+  - [x] DELETE /tarefas/{id}
+  - [x] POST /tarefas/{id}/iniciar
+  - [x] POST /tarefas/{id}/concluir
+  - [x] GET /tarefas/{id}/progresso
+  - [x] PUT /tarefas/{id}/atribuir/{usuarioId}
+  - [x] GET /tarefas/{id}/itens/{all}
+  - [x] GET /tarefas/{id}/itens/{itemId}
+  - [x] POST /tarefas/{id}/itens/{itemId}
+  - [x] DELETE /tarefas/{id}/itens/{itemId}
+  - [x] POST /tarefas/{id}/itens/{itemId}/conferir
+  - [x] GET /usuarios/{all}
+  - [x] GET /usuarios/{id}
+  - [x] POST /usuarios
+  - [x] PUT /usuarios/{id}
+  - [x] DELETE /usuarios/{id}
+  - [x] GET /usuarios/{id}/tarefas/{all}
+  - [x] GET /localizacoes/{all}
+  - [x] GET /localizacoes/{id}
+  - [x] POST /localizacoes
+  - [x] PUT /localizacoes/{id}
+  - [x] DELETE /localizacoes/{id}
+  - [x] GET /localizacoes/{id}/itens/{all}
+  - [x] GET /localizacoes/{id}/qrcode/{all}
+  
+## E assim ele ira iniciar o projeto
 
-- **[Guia de execução e testes do backend](Backend/README.md)**
-- **[Collection do Postman](Backend/ESTOK.postman_collection.json)**
-- Com o backend iniciado, acesse **http://127.0.0.1:8000/docs** para abrir **ESTOK — Swagger de Testes**.
+**[Documentação Tillwind](https://tailwindcss.com/plus/ui-blocks?ref=sidebar)**
 
-As instruções incluem preparação do MySQL, migrations, exemplos, respostas de erro e testes. A existência de telas HTML não significa que todas as rotas da API já estejam implementadas.
+## Como usar o migrations
 
-## Frontend
+Fazer o clone ou o pull do repositorio, e instalar o mySQL.
 
-Com Node.js instalado, na raiz do projeto:
+Então criar uma conexão com o seguinte usuarios:
+  * Usuario: root
+  * Senha: Senha=2709!
 
-```powershell
-npm ci
-npm run dev
-```
+Caso não tenho o banco criado, criar um banco de dados chamado estok com o comando:
+  * CREATE DATABASE estok
 
-Abra o endereço informado pelo Vite. Frontend e API são processos separados; a integração de todas as telas com o backend permanece parte do desenvolvimento do grupo.
+Apos isso entrar na pasta do projeto entrar na pasta /Backend. No meu pc o caminho completo fica
 
-## Continuidade
+ * C:\Users\Carlos\Desktop\Faculdade\ProgWeb2\Backend
 
-A versão 0.3.0 mantém o banco de desenvolvimento `estok` e o histórico de migrations (nenhuma alteração de modelo). Ainda ficam para o grupo a autenticação/autorização final (token) e a integração das telas HTML com a API.
+Então ja dentro da pasta para sincronizar o banco basta executar o comando abaixo DENTRO da pasta acima
+
+ * alembic upgrade head

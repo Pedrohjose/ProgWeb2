@@ -50,6 +50,5 @@ class ItensTarefa(Base):
 
     itens = relationship(
         "Item",
-        back_populates="item_tarefa",
-        cascade="all, delete"
+        back_populates="item_tarefa"
     )
