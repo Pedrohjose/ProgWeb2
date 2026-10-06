@@ -25,4 +25,4 @@ Abra o endereço informado pelo Vite. Frontend e API são processos separados; a
 
 ## Continuidade
 
-A versão 0.2.0 da base mantém o banco de desenvolvimento `estok_joao` e o histórico de migrations. O grupo continuará os 14 endpoints pendentes desse escopo e definirá a autenticação/autorização final.
+A versão 0.2.0 da base mantém o banco de desenvolvimento `estok` e o histórico de migrations. O grupo continuará os 14 endpoints pendentes desse escopo e definirá a autenticação/autorização final.

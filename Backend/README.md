@@ -35,7 +35,7 @@ Em outro PowerShell, **normal**, na raiz do repositório:
 powershell -NoProfile -ExecutionPolicy Bypass -File .\Backend\iniciar.ps1
 ```
 
-O script prepara `.venv`, instala as dependências, pede a senha do root local, prepara `estok_joao`, aplica as migrations pendentes e inicia a API na porta 8000. A senha é usada somente durante a execução; não é salva no código. Bypass vale apenas para esse processo do PowerShell.
+O script prepara `.venv`, instala as dependências, pede a senha do root local, prepara `estok`, aplica as migrations pendentes e inicia a API na porta 8000. A senha é usada somente durante a execução; não é salva no código. Bypass vale apenas para esse processo do PowerShell.
 
 - Swagger: http://127.0.0.1:8000/docs
 - ReDoc: http://127.0.0.1:8000/redoc
@@ -85,7 +85,7 @@ O fluxo gera um email exclusivo, salva o ID criado, testa os seis endpoints e ex
 
 ## Migrations e compatibilidade
 
-A atualização 0.2.0 não altera tabelas, modelos, senha do MySQL nem o histórico `joao_baseline_01`. Continua usando o banco de desenvolvimento `estok_joao`, para preservar os dados da base anterior. Não execute `CriacaoBanco.sql` junto com a migration nem aponte essa baseline para um banco de outra origem.
+A atualização 0.2.0 não altera tabelas, modelos, senha do MySQL nem o histórico `joao_baseline_01`. Continua usando o banco de desenvolvimento `estok`, para preservar os dados da base anterior. Não execute `CriacaoBanco.sql` junto com a migration nem aponte essa baseline para um banco de outra origem.
 
 ## Pendências da lista de 20
 

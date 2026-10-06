@@ -4,8 +4,8 @@ from sqlalchemy import create_engine, inspect, text
 from banco import DB_NAME, database_url, engine
 if not re.fullmatch(r"[A-Za-z0-9_]+", DB_NAME):
     raise SystemExit("DB_NAME inválido.")
-if DB_NAME != "estok_joao":
-    raise SystemExit("Este preparador usa somente estok_joao. Não aponte para bancos existentes do grupo.")
+if DB_NAME != "estok":
+    raise SystemExit("Este preparador usa somente estok. Não aponte para bancos existentes do grupo.")
 server = create_engine(database_url(None))
 with server.connect() as conn:
     conn.execute(text(f"CREATE DATABASE IF NOT EXISTS `{DB_NAME}` CHARACTER SET utf8mb4"))

@@ -7,7 +7,7 @@ if (-not (Test-Path $python)) {
 }
 & $python -m pip install -r requirements.txt
 if ($LASTEXITCODE -ne 0) { throw "Falha instalando dependencias." }
-$env:DB_NAME = "estok_joao"
+$env:DB_NAME = "estok"
 $env:DB_USER = "root"
 $env:DB_HOST = "127.0.0.1"
 $env:DB_PORT = "3306"
