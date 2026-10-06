@@ -4,7 +4,7 @@ Projeto de Programação Web 2: sistema de gerenciamento de patrimônio, com cad
 
 ## API e documentação
 
-A base atual oferece **6 dos 20 endpoints do escopo de autenticação, usuários, tarefas e localizações**: login e CRUD de usuários. Há também duas rotas auxiliares de diagnóstico.
+A API oferece os **20 endpoints do escopo de autenticação, usuários, tarefas e localizações**, organizados em `Backend/routers/`. Há também duas rotas auxiliares de diagnóstico.
 
 - **[Guia de execução e testes do backend](Backend/README.md)**
 - **[Collection do Postman](Backend/ESTOK.postman_collection.json)**
@@ -25,4 +25,4 @@ Abra o endereço informado pelo Vite. Frontend e API são processos separados; a
 
 ## Continuidade
 
-A versão 0.2.0 da base mantém o banco de desenvolvimento `estok` e o histórico de migrations. O grupo continuará os 14 endpoints pendentes desse escopo e definirá a autenticação/autorização final.
+A versão 0.3.0 mantém o banco de desenvolvimento `estok` e o histórico de migrations (nenhuma alteração de modelo). Ainda ficam para o grupo a autenticação/autorização final (token) e a integração das telas HTML com a API.
