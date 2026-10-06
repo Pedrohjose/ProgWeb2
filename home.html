@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estok</title>
+</head>
+
+<body>
+    ```html
+    <aside class="fixed inset-y-0 left-0 z-50 w-64 border-r border-white/10 bg-gray-950 text-white">
+        <div class="flex h-16 items-center border-b border-white/10 px-6">
+            <div class="flex items-center gap-3">
+                <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-500">
+                    <span class="font-bold">A</span>
+                </div>
+
+                <span class="text-lg font-semibold">Admin</span>
+            </div>
+        </div>
+
+        <nav class="flex flex-col gap-1 p-4">
+
+            <!-- Dashboard -->
+            <a href="dashboard.html"
+                class="flex items-center gap-3 rounded-lg bg-indigo-500/10 px-3 py-2.5 text-sm font-medium text-indigo-400">
+                <img src="/icon/dashboard.svg" alt="Dashboard">
+                Dashboard
+            </a>
+
+            <!-- Usuários -->
+            <a href="usuarios.html"
+                class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-400 transition hover:bg-white/5 hover:text-white">
+                <img src="/icon/group.svg" alt="Usuários">
+                Usuários
+            </a>
+
+            <!-- Configurações -->
+            <a href="configuracoes.html"
+                class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-400 transition hover:bg-white/5 hover:text-white">
+                <img src="/icon/settings.svg" alt="Configurações">
+                Configurações
+            </a>
+
+            <!-- Inventario -->
+            <a href="inventario.html"
+                class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-400 transition hover:bg-white/5 hover:text-white">
+                <img src="/icon/inventory.svg" alt="Inventario">
+                Inventario
+            </a>
+
+            <!-- Tarefas -->
+            <a href="tarefas.html"
+                class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-400 transition hover:bg-white/5 hover:text-white">
+                <img src="/icon/task.svg" alt="Tarefas">
+                Tarefas
+            </a>
+
+            <!-- Localizacoes -->
+            <a href="localizacoes.html"
+                class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-400 transition hover:bg-white/5 hover:text-white">
+                <img src="/icon/location.svg" alt="Localizacoes">
+                Localizacoes
+            </a>
+        </nav>
+
+        <!-- Usuário / Logout -->
+        <div class="absolute bottom-0 left-0 right-0 border-t border-white/10 p-4">
+            <div class="mb-3 flex items-center gap-3">
+                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-500">
+                    <span class="text-sm font-semibold">JD</span>
+                </div>
+
+                <div class="min-w-0">
+                    <p class="truncate text-sm font-medium text-white">
+                        João da Silva
+                    </p>
+                    <p class="truncate text-xs text-gray-500">
+                        joao@email.com
+                    </p>
+                </div>
+            </div>
+
+            <button onclick="logout()"
+                class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-400 transition hover:bg-red-500/10 hover:text-red-400">
+                <img src="/icon/logout.svg" alt="Sair">
+                Sair
+            </button>
+        </div>
+    </aside>
+
+    <!-- Conteúdo principal -->
+    <main class="ml-64 min-h-screen bg-gray-900 p-8">
+        <h1 class="text-2xl font-bold text-white">
+            Dashboard
+        </h1>
+
+        <p class="mt-2 text-gray-400">
+            Bem-vindo ao seu painel.
+        </p>
+    </main>
+
+    <script>
+        function logout() {
+            window.location.href = "login.html";
+        }
+    </script>
+    ```
+    <script type="module" src="/src/main.js"></script>
+
+</body>
+
+</html>

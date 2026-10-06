@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuários - Estok</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+
+<body class="bg-gray-900 text-white">
+    <!-- Sidebar -->
+    <aside class="fixed inset-y-0 left-0 z-50 w-64 border-r border-white/10 bg-gray-950 text-white">
+
+        <!-- Logo -->
+        <div class="flex h-16 items-center border-b border-white/10 px-6">
+            <div class="flex items-center gap-3">
+
+                <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-500">
+                    <span class="font-bold">A</span>
+                </div>
+
+                <span class="text-lg font-semibold">
+                    Admin
+                </span>
+
+            </div>
+        </div>
+
+        <!-- Menu -->
+        <nav class="flex flex-col gap-1 p-4">
+
+            <!-- Dashboard -->
+            <a href="dashboard.html"
+                class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-400 transition hover:bg-white/5 hover:text-white">
+
+                <img src="/icon/dashboard.svg" alt="Dashboard" class="h-5 w-5">
+
+                Dashboard
+            </a>
+
+            <!-- Usuários -->
+            <a href="usuarios.html"
+                class="flex items-center gap-3 rounded-lg bg-indigo-500/10 px-3 py-2.5 text-sm font-medium text-indigo-400">
+
+                <img src="/icon/group.svg" alt="Usuários" class="h-5 w-5">
+
+                Usuários
+            </a>
+
+            <!-- Configurações -->
+            <a href="configuracoes.html"
+                class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-400 transition hover:bg-white/5 hover:text-white">
+
+                <img src="/icon/settings.svg" alt="Configurações" class="h-5 w-5">
+
+                Configurações
+            </a>
+
+            <!-- Inventário -->
+            <a href="inventario.html"
+                class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-400 transition hover:bg-white/5 hover:text-white">
+
+                <img src="/icon/inventory.svg" alt="Inventário" class="h-5 w-5">
+
+                Inventário
+            </a>
+
+            <!-- Tarefas -->
+            <a href="tarefas.html"
+                class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-400 transition hover:bg-white/5 hover:text-white">
+
+                <img src="/icon/task.svg" alt="Tarefas" class="h-5 w-5">
+
+                Tarefas
+            </a>
+
+            <!-- Localizações -->
+            <a href="localizacoes.html"
+                class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-400 transition hover:bg-white/5 hover:text-white">
+
+                <img src="/icon/location.svg" alt="Localizações" class="h-5 w-5">
+
+                Localizações
+            </a>
+
+        </nav>
+
+        <!-- Usuário -->
+        <div class="absolute bottom-0 left-0 right-0 border-t border-white/10 p-4">
+
+            <div class="mb-3 flex items-center gap-3">
+
+                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-500">
+                    <span class="text-sm font-semibold">
+                        JD
+                    </span>
+                </div>
+
+                <div class="min-w-0">
+
+                    <p class="truncate text-sm font-medium text-white">
+                        João da Silva
+                    </p>
+
+                    <p class="truncate text-xs text-gray-500">
+                        joao@email.com
+                    </p>
+
+                </div>
+
+            </div>
+
+            <button onclick="logout()"
+                class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-400 transition hover:bg-red-500/10 hover:text-red-400">
+
+                <img src="/icon/logout.svg" alt="Sair" class="h-5 w-5">
+
+                Sair
+
+            </button>
+
+        </div>
+
+    </aside>
+
+    <!-- Conteúdo principal -->
+    <main class="ml-64 min-h-screen bg-gray-900 p-8">
+
+        <!-- Cabeçalho -->
+        <div class="mb-8 flex items-center justify-between">
+
+            <div>
+
+                <h1 class="text-2xl font-bold text-white">
+                    Usuários
+                </h1>
+
+                <p class="mt-2 text-sm text-gray-400">
+                    Consulte e gerencie os usuários do sistema.
+                </p>
+
+            </div>
+
+            <button onclick="abrirModal()"
+                class="flex items-center gap-2 rounded-lg bg-indigo-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-600">
+
+                <span class="text-lg">+</span>
+
+                Adicionar usuário
+
+            </button>
+
+        </div>
+
+        <!-- Área principal -->
+        <div class="rounded-xl border border-white/10 bg-gray-950 shadow-xl">
+
+            <!-- Filtros -->
+            <div class="border-b border-white/10 p-5">
+
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+
+                    <!-- Pesquisa -->
+                    <div>
+
+                        <label class="mb-2 block text-sm font-medium text-gray-300">
+                            Pesquisar
+                        </label>
+
+                        <div class="relative">
+
+                            <input id="campoPesquisa" type="text" placeholder="Nome ou e-mail..."
+                                oninput="filtrarUsuarios()"
+                                class="w-full rounded-lg border border-white/10 bg-gray-900 px-4 py-2.5 text-sm text-white outline-none placeholder:text-gray-500 focus:border-indigo-500">
+
+                        </div>
+
+                    </div>
+
+                    <!-- Perfil -->
+                    <div>
+
+                        <label class="mb-2 block text-sm font-medium text-gray-300">
+                            Perfil
+                        </label>
+
+                        <select id="filtroPerfil" onchange="filtrarUsuarios()"
+                            class="w-full rounded-lg border border-white/10 bg-gray-900 px-4 py-2.5 text-sm text-white outline-none focus:border-indigo-500">
+
+                            <option value="">Todos os perfis</option>
+                            <option value="Administrador">Administrador</option>
+                            <option value="Funcionário">Funcionário</option>
+                            <option value="Gerente">Gerente</option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- Status -->
+                    <div>
+
+                        <label class="mb-2 block text-sm font-medium text-gray-300">
+                            Status
+                        </label>
+
+                        <select id="filtroStatus" onchange="filtrarUsuarios()"
+                            class="w-full rounded-lg border border-white/10 bg-gray-900 px-4 py-2.5 text-sm text-white outline-none focus:border-indigo-500">
+
+                            <option value="">Todos os status</option>
+                            <option value="Ativo">Ativo</option>
+                            <option value="Inativo">Inativo</option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Tabela -->
+            <div class="overflow-x-auto">
+
+                <table class="w-full text-left">
+
+                    <thead class="border-b border-white/10 bg-gray-900/50">
+
+                        <tr>
+
+                            <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" id="selecionarTodos" onchange="selecionarTodosUsuarios()"
+                                        class="h-4 w-4 rounded border-gray-600 bg-gray-800 text-indigo-500 focus:ring-indigo-500">
+
+                                    <span>Usuário</span>
+                                </div>
+                            </th>
+
+                            <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                Perfil
+                            </th>
+
+                            <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                Status
+                            </th>
+
+                            <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                Ações
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="listaUsuarios" class="divide-y divide-white/5">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <!-- Rodapé -->
+            <div class="flex items-center justify-between border-t border-white/10 px-6 py-4">
+
+                <span id="contadorUsuarios" class="text-sm text-gray-500">
+                    0 usuários
+                </span>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Modal adicionar usuário -->
+    <div id="modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+
+        <div class="w-full max-w-md rounded-xl border border-white/10 bg-gray-950 shadow-2xl">
+
+            <!-- Cabeçalho -->
+            <div class="flex items-center justify-between border-b border-white/10 px-6 py-4">
+
+                <div>
+
+                    <h2 class="text-lg font-semibold text-white">
+                        Adicionar usuário
+                    </h2>
+
+                    <p class="mt-1 text-sm text-gray-500">
+                        Cadastre um novo usuário.
+                    </p>
+
+                </div>
+
+                <button onclick="fecharModal()" class="text-2xl text-gray-500 transition hover:text-white">
+                    &times;
+                </button>
+
+            </div>
+
+            <!-- Formulário -->
+            <form onsubmit="adicionarUsuario(event)" class="space-y-5 p-6">
+
+                <!-- Nome -->
+                <div>
+
+                    <label class="mb-2 block text-sm font-medium text-gray-300">
+                        Nome
+                    </label>
+
+                    <input id="nomeUsuario" type="text" required placeholder="Digite o nome"
+                        class="w-full rounded-lg border border-white/10 bg-gray-900 px-4 py-2.5 text-sm text-white outline-none placeholder:text-gray-500 focus:border-indigo-500">
+
+                </div>
+
+                <!-- E-mail -->
+                <div>
+
+                    <label class="mb-2 block text-sm font-medium text-gray-300">
+                        E-mail
+                    </label>
+
+                    <input id="emailUsuario" type="email" required placeholder="usuario@email.com"
+                        class="w-full rounded-lg border border-white/10 bg-gray-900 px-4 py-2.5 text-sm text-white outline-none placeholder:text-gray-500 focus:border-indigo-500">
+
+                </div>
+
+                <!-- Perfil -->
+                <div>
+
+                    <label class="mb-2 block text-sm font-medium text-gray-300">
+                        Perfil
+                    </label>
+
+                    <select id="perfilUsuario" required
+                        class="w-full rounded-lg border border-white/10 bg-gray-900 px-4 py-2.5 text-sm text-white outline-none focus:border-indigo-500">
+
+                        <option value="Funcionário">Funcionário</option>
+                        <option value="Gerente">Gerente</option>
+                        <option value="Administrador">Administrador</option>
+
+                    </select>
+
+                </div>
+
+                <!-- Botões -->
+                <div class="flex justify-end gap-3 pt-2">
+
+                    <button type="button" onclick="fecharModal()"
+                        class="rounded-lg px-4 py-2.5 text-sm font-medium text-gray-400 transition hover:bg-white/5 hover:text-white">
+
+                        Cancelar
+
+                    </button>
+
+                    <button type="submit"
+                        class="rounded-lg bg-indigo-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-600">
+
+                        Adicionar
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <script>
+        let usuarios = [
+            {
+                id: 1,
+                nome: "João da Silva",
+                email: "joao@email.com",
+                perfil: "Administrador",
+                status: "Ativo"
+            },
+            {
+                id: 2,
+                nome: "Maria Oliveira",
+                email: "maria@email.com",
+                perfil: "Gerente",
+                status: "Ativo"
+            },
+            {
+                id: 3,
+                nome: "Carlos Santos",
+                email: "carlos@email.com",
+                perfil: "Funcionário",
+                status: "Ativo"
+            },
+            {
+                id: 4,
+                nome: "Ana Souza",
+                email: "ana@email.com",
+                perfil: "Funcionário",
+                status: "Inativo"
+            }
+        ];
+
+        // Renderiza usuários
+        function renderizarUsuarios(lista = usuarios) {
+
+            const tabela = document.getElementById("listaUsuarios");
+
+            tabela.innerHTML = "";
+
+            if (lista.length === 0) {
+
+                tabela.innerHTML = `
+        <tr>
+            <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-500">
+                Nenhum usuário encontrado.
+            </td>
+        </tr>
+    `;
+
+                return;
+            }
+
+
+            lista.forEach(usuario => {
+
+                const statusAtivo = usuario.status === "Ativo";
+
+                const linha = document.createElement("tr");
+
+                linha.className = "transition hover:bg-white/[0.02]";
+
+
+                linha.innerHTML = `
+
+        <!-- Usuário -->
+        <td class="px-6 py-4">
+
+            <div class="flex items-center gap-3">
+
+                <!-- Checkbox -->
+                <input
+                    type="checkbox"
+                    class="checkbox-usuario h-4 w-4 rounded border-gray-600 bg-gray-800 text-indigo-500 focus:ring-indigo-500"
+                    value="${usuario.id}"
+                >
+
+
+                <!-- Avatar -->
+                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-500/20 text-sm font-semibold text-indigo-400">
+
+                    ${usuario.nome
+                        .split(" ")
+                        .map(nome => nome[0])
+                        .slice(0, 2)
+                        .join("")
+                    }
+
+                </div>
+
+
+                <!-- Nome e email -->
+                <div>
+
+                    <p class="text-sm font-medium text-white">
+                        ${usuario.nome}
+                    </p>
+
+                    <p class="text-xs text-gray-500">
+                        ${usuario.email}
+                    </p>
+
+                </div>
+
+            </div>
+
+        </td>
+
+
+        <!-- Perfil -->
+        <td class="px-6 py-4">
+
+            <span class="text-sm text-gray-300">
+                ${usuario.perfil}
+            </span>
+
+        </td>
+
+
+        <!-- Status -->
+        <td class="px-6 py-4">
+
+            <span
+                class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium
+                ${statusAtivo
+                        ? "bg-green-500/10 text-green-400"
+                        : "bg-red-500/10 text-red-400"
+                    }"
+            >
+
+                <span
+                    class="h-1.5 w-1.5 rounded-full
+                    ${statusAtivo
+                        ? "bg-green-400"
+                        : "bg-red-400"
+                    }"
+                ></span>
+
+                ${usuario.status}
+
+            </span>
+
+        </td>
+
+
+        <!-- Ações -->
+        <td class="px-6 py-4">
+
+            <button
+                onclick="removerUsuario(${usuario.id})"
+                class="rounded-lg px-3 py-2 text-sm font-medium text-red-400 transition hover:bg-red-500/10"
+            >
+
+                Remover
+
+            </button>
+
+        </td>
+
+    `;
+
+
+                tabela.appendChild(linha);
+
+            });
+
+
+            document.getElementById("contadorUsuarios").textContent =
+                `${lista.length} ${lista.length === 1 ? "usuário" : "usuários"}`;
+
+
+        }
+
+        // Filtrar usuários
+        function filtrarUsuarios() {
+
+            const pesquisa =
+                document.getElementById("campoPesquisa").value.toLowerCase();
+
+            const perfil =
+                document.getElementById("filtroPerfil").value;
+
+            const status =
+                document.getElementById("filtroStatus").value;
+
+            const resultado = usuarios.filter(usuario => {
+
+                const correspondePesquisa =
+                    usuario.nome.toLowerCase().includes(pesquisa) ||
+                    usuario.email.toLowerCase().includes(pesquisa);
+
+                const correspondePerfil =
+                    perfil === "" || usuario.perfil === perfil;
+
+                const correspondeStatus =
+                    status === "" || usuario.status === status;
+
+                return correspondePesquisa &&
+                    correspondePerfil &&
+                    correspondeStatus;
+
+            });
+
+            renderizarUsuarios(resultado);
+
+        }
+
+        // Abrir modal
+        function abrirModal() {
+
+            const modal = document.getElementById("modal");
+
+            modal.classList.remove("hidden");
+
+            modal.classList.add("flex");
+
+            document.getElementById("nomeUsuario").focus();
+
+        }
+
+        // Fechar modal
+        function fecharModal() {
+
+            const modal = document.getElementById("modal");
+
+            modal.classList.add("hidden");
+
+            modal.classList.remove("flex");
+
+        }
+
+        // Adicionar usuário
+        function adicionarUsuario(event) {
+
+            event.preventDefault();
+
+            const nome =
+                document.getElementById("nomeUsuario").value;
+
+            const email =
+                document.getElementById("emailUsuario").value;
+
+            const perfil =
+                document.getElementById("perfilUsuario").value;
+
+            const novoUsuario = {
+
+                id: Date.now(),
+
+                nome: nome,
+
+                email: email,
+
+                perfil: perfil,
+
+                status: "Ativo"
+
+            };
+
+            usuarios.push(novoUsuario);
+
+            event.target.reset();
+
+            fecharModal();
+
+            renderizarUsuarios();
+
+        }
+
+        // Remover usuário
+        function removerUsuario(id) {
+
+            const usuario = usuarios.find(usuario => usuario.id === id);
+
+            if (!usuario) {
+                return;
+            }
+
+            const confirmar = confirm(
+                `Deseja realmente remover o usuário "${usuario.nome}"?`
+            );
+
+            if (!confirmar) {
+                return;
+            }
+
+            usuarios = usuarios.filter(usuario => usuario.id !== id);
+
+            filtrarUsuarios();
+
+        }
+
+        // Logout
+        function logout() {
+
+            window.location.href = "login.html";
+
+        }
+
+        // Inicialização
+        renderizarUsuarios();
+
+    </script>

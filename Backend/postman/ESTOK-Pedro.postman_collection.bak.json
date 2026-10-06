@@ -1,0 +1,487 @@
+{
+  "info": {
+    "description": "Collection sequencial dos 17 endpoints. Inclui 5 casos negativos para validar respostas 404 e 409. Configure baseUrl e taskId para uma tarefa pendente com banco de teste.",
+    "name": "ESTOK API - Pedro",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "value": "http://localhost:8000",
+      "key": "baseUrl"
+    },
+    {
+      "value": "1",
+      "key": "itemId"
+    },
+    {
+      "value": "1",
+      "key": "taskId"
+    },
+    {
+      "value": "ESTOK-VAL-001",
+      "key": "itemCode"
+    }
+  ],
+  "item": [
+    {
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/itens/all"
+      },
+      "name": "Listar itens",
+      "event": [
+        {
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+            ]
+          },
+          "listen": "test"
+        }
+      ]
+    },
+    {
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "value": "application/json",
+            "key": "Content-Type"
+          }
+        ],
+        "url": "{{baseUrl}}/itens",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"codigoUnico\":\"ESTOK-VAL-001\",\"nome\":\"Notebook\",\"descricao\":\"Item de exemplo\",\"id_localizacao\":null}"
+        }
+      },
+      "name": "Cadastrar item",
+      "event": [
+        {
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+              "const item = pm.response.json();",
+              "pm.collectionVariables.set('itemId', String(item.id));",
+              "pm.collectionVariables.set('itemCode', item.codigoUnico);",
+              "pm.test('Item criado', function () { pm.expect(item.codigoUnico).to.eql('ESTOK-VAL-001'); });"
+            ]
+          },
+          "listen": "test"
+        }
+      ]
+    },
+    {
+      "name": "Consultar item inexistente (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 404', function () { pm.response.to.have.status(404); });",
+              "pm.test('Erro documentado', function () { pm.expect(pm.response.json()).to.have.property('detail'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/itens/99999999",
+        "header": []
+      }
+    },
+    {
+      "name": "Cadastrar código repetido (409)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 409', function () { pm.response.to.have.status(409); });",
+              "pm.test('Erro documentado', function () { pm.expect(pm.response.json()).to.have.property('detail'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "body": {
+          "raw": "{\"codigoUnico\":\"{{itemCode}}\",\"nome\":\"Duplicado\",\"descricao\":\"Deve retornar conflito\",\"id_localizacao\":null}",
+          "mode": "raw"
+        },
+        "url": "{{baseUrl}}/itens",
+        "header": [
+          {
+            "value": "application/json",
+            "key": "Content-Type"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/itens/{{itemId}}"
+      },
+      "name": "Consultar item",
+      "event": [
+        {
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+            ]
+          },
+          "listen": "test"
+        }
+      ]
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "value": "application/json",
+            "key": "Content-Type"
+          }
+        ],
+        "url": "{{baseUrl}}/itens/{{itemId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"codigoUnico\":\"{{itemCode}}\",\"nome\":\"Notebook atualizado\",\"descricao\":\"Item de exemplo\",\"id_localizacao\":null}"
+        }
+      },
+      "name": "Atualizar item",
+      "event": [
+        {
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+            ]
+          },
+          "listen": "test"
+        }
+      ]
+    },
+    {
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/itens/{{itemId}}/qrcode"
+      },
+      "name": "Obter QR Code do item",
+      "event": [
+        {
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Conteúdo PNG', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('image/png'); });"
+            ]
+          },
+          "listen": "test"
+        }
+      ]
+    },
+    {
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{baseUrl}}/itens/{{itemId}}/qrcode"
+      },
+      "name": "Gerar QR Code do item",
+      "event": [
+        {
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Conteúdo PNG', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('image/png'); });"
+            ]
+          },
+          "listen": "test"
+        }
+      ]
+    },
+    {
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/qrcode/{{itemCode}}"
+      },
+      "name": "Obter QR Code por código",
+      "event": [
+        {
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Conteúdo PNG', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('image/png'); });"
+            ]
+          },
+          "listen": "test"
+        }
+      ]
+    },
+    {
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/qrcode/all"
+      },
+      "name": "Listar QR Codes",
+      "event": [
+        {
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+            ]
+          },
+          "listen": "test"
+        }
+      ]
+    },
+    {
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{baseUrl}}/tarefas/{{taskId}}/iniciar"
+      },
+      "name": "Iniciar tarefa",
+      "event": [
+        {
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+            ]
+          },
+          "listen": "test"
+        }
+      ]
+    },
+    {
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{baseUrl}}/tarefas/{{taskId}}/itens/{{itemId}}"
+      },
+      "name": "Adicionar item à tarefa",
+      "event": [
+        {
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });"
+            ]
+          },
+          "listen": "test"
+        }
+      ]
+    },
+    {
+      "name": "Associar item repetido (409)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 409', function () { pm.response.to.have.status(409); });",
+              "pm.test('Erro documentado', function () { pm.expect(pm.response.json()).to.have.property('detail'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/tarefas/{{taskId}}/itens/{{itemId}}",
+        "header": []
+      }
+    },
+    {
+      "name": "Concluir com item pendente (409)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 409', function () { pm.response.to.have.status(409); });",
+              "pm.test('Erro documentado', function () { pm.expect(pm.response.json()).to.have.property('detail'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/tarefas/{{taskId}}/concluir",
+        "header": []
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/tarefas/{{taskId}}/itens/all"
+      },
+      "name": "Listar itens da tarefa",
+      "event": [
+        {
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+            ]
+          },
+          "listen": "test"
+        }
+      ]
+    },
+    {
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/tarefas/{{taskId}}/itens/{{itemId}}"
+      },
+      "name": "Consultar item da tarefa",
+      "event": [
+        {
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+            ]
+          },
+          "listen": "test"
+        }
+      ]
+    },
+    {
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{baseUrl}}/tarefas/{{taskId}}/itens/{{itemId}}/conferir"
+      },
+      "name": "Conferir item da tarefa",
+      "event": [
+        {
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Item conferido', function () { pm.expect(pm.response.json().status).to.eql('Conferido'); });"
+            ]
+          },
+          "listen": "test"
+        }
+      ]
+    },
+    {
+      "name": "Conferir item já conferido (409)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 409', function () { pm.response.to.have.status(409); });",
+              "pm.test('Erro documentado', function () { pm.expect(pm.response.json()).to.have.property('detail'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/tarefas/{{taskId}}/itens/{{itemId}}/conferir",
+        "header": []
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/tarefas/{{taskId}}/progresso"
+      },
+      "name": "Consultar progresso da tarefa",
+      "event": [
+        {
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Progresso disponível', function () { const p = pm.response.json(); pm.expect(p).to.have.property('totalItens'); pm.expect(p).to.have.property('itensConferidos'); });"
+            ]
+          },
+          "listen": "test"
+        }
+      ]
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/tarefas/{{taskId}}/itens/{{itemId}}"
+      },
+      "name": "Remover item da tarefa",
+      "event": [
+        {
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 204', function () { pm.response.to.have.status(204); });"
+            ]
+          },
+          "listen": "test"
+        }
+      ]
+    },
+    {
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{baseUrl}}/tarefas/{{taskId}}/concluir"
+      },
+      "name": "Concluir tarefa",
+      "event": [
+        {
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Tarefa concluída', function () { pm.expect(pm.response.json().status).to.eql('Concluida'); });"
+            ]
+          },
+          "listen": "test"
+        }
+      ]
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/itens/{{itemId}}"
+      },
+      "name": "Excluir item",
+      "event": [
+        {
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 204', function () { pm.response.to.have.status(204); });"
+            ]
+          },
+          "listen": "test"
+        }
+      ]
+    }
+  ]
+}

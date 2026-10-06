@@ -1,0 +1,52 @@
+POST /login []
+
+---Xx-xX---
+
+GET /itens/{all} []
+GET /itens/{id} []
+POST /itens []
+PUT /itens/{id} []
+DELETE /itens/{id} []
+GET /itens/{id}/qrcode []
+POST /itens/{id}/qrcode []
+
+---Xx-xX---
+
+GET /qrcode/{codigo} []
+GET /qrcode/{all} []
+
+---Xx-xX---
+
+GET /tarefas/{all} []
+GET /tarefas/{id} []
+POST /tarefas []
+PUT /tarefas/{id} []
+DELETE /tarefas/{id} []
+POST /tarefas/{id}/iniciar []
+POST /tarefas/{id}/concluir []
+GET /tarefas/{id}/progresso []
+PUT /tarefas/{id}/atribuir/{usuarioId} []
+GET /tarefas/{id}/itens/{all} []
+GET /tarefas/{id}/itens/{itemId} []
+POST /tarefas/{id}/itens/{itemId} []
+DELETE /tarefas/{id}/itens/{itemId} []
+POST /tarefas/{id}/itens/{itemId}/conferir []
+
+---Xx-xX---
+
+GET /usuarios/{all} []
+GET /usuarios/{id} []
+POST /usuarios [x]
+PUT /usuarios/{id} []
+DELETE /usuarios/{id} []
+GET /usuarios/{id}/tarefas/{all} []
+
+---Xx-xX---
+
+GET /localizacoes/{all} []
+GET /localizacoes/{id} []
+POST /localizacoes []
+PUT /localizacoes/{id} []
+DELETE /localizacoes/{id} []
+GET /localizacoes/{id}/itens/{all} []
+GET /localizacoes/{id}/qrcode/{all} []

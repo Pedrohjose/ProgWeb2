@@ -1,0 +1,1544 @@
+{
+  "info": {
+    "name": "ESTOK API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Validação dos 20 endpoints do escopo (login, usuários, localizações e gestão de tarefas), mais diagnóstico. Execute a collection inteira no Collection Runner, na ordem; cada pasta cria e exclui seus próprios dados de teste. Não use dados reais."
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "email_auth",
+      "value": ""
+    },
+    {
+      "key": "auth_usuario_id",
+      "value": "-1"
+    },
+    {
+      "key": "email_teste",
+      "value": ""
+    },
+    {
+      "key": "usuario_id",
+      "value": "-1"
+    },
+    {
+      "key": "tarefa_vinculada_id",
+      "value": "-1"
+    },
+    {
+      "key": "localizacao_id",
+      "value": "-1"
+    },
+    {
+      "key": "email_responsavel",
+      "value": ""
+    },
+    {
+      "key": "responsavel_id",
+      "value": "-1"
+    },
+    {
+      "key": "titulo_teste",
+      "value": ""
+    },
+    {
+      "key": "tarefa_id",
+      "value": "-1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Diagnóstico",
+      "description": "Rotas auxiliares (não fazem parte dos 20 endpoints).",
+      "item": [
+        {
+          "name": "01 — API disponível",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/saude"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "02 — Banco conectado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/saude/banco"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Autenticação",
+      "description": "Item 1. Cria um usuário exclusivo, testa o login e o exclui ao final.",
+      "item": [
+        {
+          "name": "01 — Cadastrar usuário de teste",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/usuarios",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Usuário de Teste\",\n  \"email\": \"{{email_auth}}\",\n  \"senha\": \"TesteLocal123!\",\n  \"perfil\": \"Funcionario\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"auth_usuario_id\", \"-1\");",
+                  "pm.collectionVariables.set(\"email_auth\", \"estok.auth.\" + pm.variables.replaceIn(\"{{$guid}}\") + \"@example.com\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Resposta sem senha\", function () { pm.expect(pm.response.json()).not.to.have.property(\"senha\"); });",
+                  "if(pm.response.code === 201) { pm.collectionVariables.set(\"auth_usuario_id\", pm.response.json().id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "02 — Login válido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email_auth}}\",\n  \"senha\": \"TesteLocal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Login não expõe senha\", function () { pm.expect(pm.response.json().usuario).not.to.have.property(\"senha\"); });",
+                  "pm.test(\"Mensagem de sucesso\", function () { pm.expect(pm.response.json().mensagem).to.equal(\"Login realizado com sucesso\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03 — Rejeitar senha incorreta",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email_auth}}\",\n  \"senha\": \"incorreta\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "04 — Rejeitar email não cadastrado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"naoexiste@example.com\",\n  \"senha\": \"TesteLocal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "05 — Rejeitar corpo sem senha",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email_auth}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 422\", function () { pm.response.to.have.status(422); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "06 — Excluir usuário de teste",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/usuarios/{{auth_usuario_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 204\", function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Usuários",
+      "description": "Itens 8 a 13. Cria, consulta, atualiza e exclui um usuário exclusivo, incluindo a consulta de tarefas do usuário.",
+      "item": [
+        {
+          "name": "01 — Cadastrar usuário",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/usuarios",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Usuário de Teste\",\n  \"email\": \"{{email_teste}}\",\n  \"senha\": \"TesteLocal123!\",\n  \"perfil\": \"Funcionario\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"usuario_id\", \"-1\");",
+                  "pm.collectionVariables.set(\"email_teste\", \"estok.\" + pm.variables.replaceIn(\"{{$guid}}\") + \"@example.com\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Resposta sem senha\", function () { pm.expect(pm.response.json()).not.to.have.property(\"senha\"); });",
+                  "if(pm.response.code === 201) { pm.collectionVariables.set(\"usuario_id\", pm.response.json().id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "02 — Rejeitar email duplicado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/usuarios",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Usuário de Teste\",\n  \"email\": \"{{email_teste}}\",\n  \"senha\": \"TesteLocal123!\",\n  \"perfil\": \"Funcionario\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 409\", function () { pm.response.to.have.status(409); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03 — Listar usuários",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/usuarios/all"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Usuário criado consta na lista\", function () { pm.expect(pm.response.json().some(x => x.id === Number(pm.collectionVariables.get(\"usuario_id\")))).to.equal(true); });",
+                  "pm.test(\"Lista sem senhas\", function () { pm.response.json().forEach(u => pm.expect(u).not.to.have.property(\"senha\")); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "04 — Consultar usuário por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/usuarios/{{usuario_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Resposta sem senha\", function () { pm.expect(pm.response.json()).not.to.have.property(\"senha\"); });",
+                  "pm.test(\"ID corresponde ao cadastro\", function () { pm.expect(pm.response.json().id).to.equal(Number(pm.collectionVariables.get(\"usuario_id\"))); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "05 — Atualizar usuário",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/usuarios/{{usuario_id}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Usuário Atualizado\",\n  \"email\": \"{{email_teste}}\",\n  \"senha\": \"TesteLocal123!\",\n  \"perfil\": \"Funcionario\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Resposta sem senha\", function () { pm.expect(pm.response.json()).not.to.have.property(\"senha\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "06 — Conferir atualização salva",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/usuarios/{{usuario_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Nome atualizado persistiu\", function () { pm.expect(pm.response.json().nome).to.equal(\"Usuário Atualizado\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "07 — Rejeitar dados inválidos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/usuarios",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 422\", function () { pm.response.to.have.status(422); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "08 — Consultar ID inexistente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/usuarios/-1"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "09 — Rejeitar ID não inteiro",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/usuarios/abc"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 422\", function () { pm.response.to.have.status(422); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "10 — Listar tarefas de usuário inexistente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/usuarios/-1/tarefas/all"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "11 — Listar tarefas do usuário (vazio)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/usuarios/{{usuario_id}}/tarefas/all"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Usuário novo não tem tarefas\", function () { pm.expect(pm.response.json()).to.eql([]); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "12 — Criar tarefa vinculada ao usuário",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/tarefas",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Tarefa do usuário {{email_teste}}\",\n  \"descricao\": \"Tarefa criada pelo Postman\",\n  \"prazo\": \"2026-12-01\",\n  \"status\": \"Pendante\",\n  \"id_usuario\": {{usuario_id}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"tarefa_vinculada_id\", \"-1\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "if(pm.response.code === 201) { pm.collectionVariables.set(\"tarefa_vinculada_id\", pm.response.json().id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "13 — Listar tarefas do usuário",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/usuarios/{{usuario_id}}/tarefas/all"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tarefa vinculada consta na lista\", function () { pm.expect(pm.response.json().some(x => x.id === Number(pm.collectionVariables.get(\"tarefa_vinculada_id\")))).to.equal(true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "14 — Rejeitar exclusão de usuário com tarefa",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/usuarios/{{usuario_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 409\", function () { pm.response.to.have.status(409); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "15 — Excluir tarefa vinculada",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/tarefas/{{tarefa_vinculada_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 204\", function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "16 — Excluir usuário de teste",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/usuarios/{{usuario_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 204\", function () { pm.response.to.have.status(204); });",
+                  "pm.test(\"Exclusão sem conteúdo\", function () { pm.expect(pm.response.text()).to.equal(\"\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "17 — Confirmar exclusão",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/usuarios/{{usuario_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "18 — Repetir exclusão",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/usuarios/{{usuario_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Localizações",
+      "description": "Itens 14 a 20. Cria, consulta, atualiza e exclui uma localização exclusiva.",
+      "item": [
+        {
+          "name": "01 — Cadastrar localização",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/localizacoes",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Almoxarifado Postman\",\n  \"cep\": \"01310100\",\n  \"logradouro\": \"Avenida Paulista\",\n  \"numero\": \"1000\",\n  \"complemento\": \"Bloco B\",\n  \"bairro\": \"Bela Vista\",\n  \"cidade\": \"São Paulo\",\n  \"estado\": \"sp\",\n  \"latitude\": -23.5614,\n  \"longitude\": -46.6559,\n  \"tipo_endereco\": \"Comercial\",\n  \"principal\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"localizacao_id\", \"-1\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Estado gravado em maiúsculas\", function () { pm.expect(pm.response.json().estado).to.equal(\"SP\"); });",
+                  "if(pm.response.code === 201) { pm.collectionVariables.set(\"localizacao_id\", pm.response.json().id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "02 — Listar localizações",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/localizacoes/all"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Localização criada consta na lista\", function () { pm.expect(pm.response.json().some(x => x.id === Number(pm.collectionVariables.get(\"localizacao_id\")))).to.equal(true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03 — Consultar localização por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/localizacoes/{{localizacao_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"ID corresponde ao cadastro\", function () { pm.expect(pm.response.json().id).to.equal(Number(pm.collectionVariables.get(\"localizacao_id\"))); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "04 — Atualizar localização",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/localizacoes/{{localizacao_id}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Almoxarifado Atualizado\",\n  \"cep\": \"01310100\",\n  \"logradouro\": \"Avenida Paulista\",\n  \"numero\": \"1000\",\n  \"complemento\": \"Bloco B\",\n  \"bairro\": \"Bela Vista\",\n  \"cidade\": \"São Paulo\",\n  \"estado\": \"sp\",\n  \"latitude\": -23.5614,\n  \"longitude\": -46.6559,\n  \"tipo_endereco\": \"Comercial\",\n  \"principal\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "05 — Conferir atualização salva",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/localizacoes/{{localizacao_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Nome atualizado persistiu\", function () { pm.expect(pm.response.json().nome).to.equal(\"Almoxarifado Atualizado\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "06 — Listar itens da localização",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/localizacoes/{{localizacao_id}}/itens/all"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Resposta é uma lista\", function () { pm.expect(pm.response.json()).to.be.an(\"array\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "07 — Listar QR Codes da localização",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/localizacoes/{{localizacao_id}}/qrcode/all"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Resposta é uma lista\", function () { pm.expect(pm.response.json()).to.be.an(\"array\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "08 — Rejeitar CEP inválido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/localizacoes",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Almoxarifado Postman\",\n  \"cep\": \"123\",\n  \"logradouro\": \"Avenida Paulista\",\n  \"numero\": \"1000\",\n  \"complemento\": \"Bloco B\",\n  \"bairro\": \"Bela Vista\",\n  \"cidade\": \"São Paulo\",\n  \"estado\": \"sp\",\n  \"latitude\": -23.5614,\n  \"longitude\": -46.6559,\n  \"tipo_endereco\": \"Comercial\",\n  \"principal\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 422\", function () { pm.response.to.have.status(422); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "09 — Consultar ID inexistente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/localizacoes/-1"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "10 — Itens de localização inexistente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/localizacoes/-1/itens/all"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "11 — QR Codes de localização inexistente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/localizacoes/-1/qrcode/all"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "12 — Excluir localização de teste",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/localizacoes/{{localizacao_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 204\", function () { pm.response.to.have.status(204); });",
+                  "pm.test(\"Exclusão sem conteúdo\", function () { pm.expect(pm.response.text()).to.equal(\"\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "13 — Confirmar exclusão",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/localizacoes/{{localizacao_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "14 — Repetir exclusão",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/localizacoes/{{localizacao_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tarefas - Gestão",
+      "description": "Itens 2 a 7. Cria um usuário responsável e uma tarefa, edita, atribui e exclui ao final.",
+      "item": [
+        {
+          "name": "01 — Cadastrar usuário responsável",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/usuarios",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Responsável de Teste\",\n  \"email\": \"{{email_responsavel}}\",\n  \"senha\": \"TesteLocal123!\",\n  \"perfil\": \"Funcionario\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"responsavel_id\", \"-1\");",
+                  "pm.collectionVariables.set(\"email_responsavel\", \"estok.resp.\" + pm.variables.replaceIn(\"{{$guid}}\") + \"@example.com\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "if(pm.response.code === 201) { pm.collectionVariables.set(\"responsavel_id\", pm.response.json().id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "02 — Criar tarefa",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/tarefas",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"{{titulo_teste}}\",\n  \"descricao\": \"Tarefa criada pelo Postman\",\n  \"prazo\": \"2026-12-01\",\n  \"status\": \"Pendante\",\n  \"id_usuario\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"tarefa_id\", \"-1\");",
+                  "pm.collectionVariables.set(\"titulo_teste\", \"Tarefa Postman \" + pm.variables.replaceIn(\"{{$guid}}\") + \"\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Status padrão e sem responsável\", function () { const t = pm.response.json(); pm.expect(t.status).to.equal(\"Pendante\"); pm.expect(t.id_usuario).to.equal(null); });",
+                  "if(pm.response.code === 201) { pm.collectionVariables.set(\"tarefa_id\", pm.response.json().id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03 — Rejeitar título duplicado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/tarefas",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"{{titulo_teste}}\",\n  \"descricao\": \"Tarefa criada pelo Postman\",\n  \"prazo\": \"2026-12-01\",\n  \"status\": \"Pendante\",\n  \"id_usuario\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 409\", function () { pm.response.to.have.status(409); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "04 — Rejeitar usuário inexistente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/tarefas",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"{{titulo_teste}} outro\",\n  \"prazo\": \"2026-12-01\",\n  \"id_usuario\": 2147483647\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "05 — Rejeitar dados inválidos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/tarefas",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 422\", function () { pm.response.to.have.status(422); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "06 — Listar tarefas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/tarefas/all"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tarefa criada consta na lista\", function () { pm.expect(pm.response.json().some(x => x.id === Number(pm.collectionVariables.get(\"tarefa_id\")))).to.equal(true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "07 — Consultar tarefa por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/tarefas/{{tarefa_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"ID corresponde ao cadastro\", function () { pm.expect(pm.response.json().id).to.equal(Number(pm.collectionVariables.get(\"tarefa_id\"))); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "08 — Editar tarefa",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/tarefas/{{tarefa_id}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"{{titulo_teste}}\",\n  \"descricao\": \"Descrição atualizada\",\n  \"prazo\": \"2026-12-15\",\n  \"status\": \"Em_Andamento\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Status atualizado\", function () { pm.expect(pm.response.json().status).to.equal(\"Em_Andamento\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "09 — Conferir edição salva",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/tarefas/{{tarefa_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Descrição atualizada persistiu\", function () { pm.expect(pm.response.json().descricao).to.equal(\"Descrição atualizada\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "10 — Atribuir tarefa ao responsável",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": "{{base_url}}/tarefas/{{tarefa_id}}/atribuir/{{responsavel_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Responsável definido\", function () { pm.expect(pm.response.json().id_usuario).to.equal(Number(pm.collectionVariables.get(\"responsavel_id\"))); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "11 — Atribuir a usuário inexistente",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": "{{base_url}}/tarefas/{{tarefa_id}}/atribuir/-1"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "12 — Atribuir tarefa inexistente",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": "{{base_url}}/tarefas/-1/atribuir/{{responsavel_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "13 — Consultar ID inexistente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/tarefas/-1"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "14 — Rejeitar ID não inteiro",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/tarefas/abc"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 422\", function () { pm.response.to.have.status(422); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "15 — Excluir tarefa de teste",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/tarefas/{{tarefa_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 204\", function () { pm.response.to.have.status(204); });",
+                  "pm.test(\"Exclusão sem conteúdo\", function () { pm.expect(pm.response.text()).to.equal(\"\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "16 — Confirmar exclusão",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/tarefas/{{tarefa_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "17 — Repetir exclusão",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/tarefas/{{tarefa_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "18 — Excluir usuário responsável",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/usuarios/{{responsavel_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 204\", function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
