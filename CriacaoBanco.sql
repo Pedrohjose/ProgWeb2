@@ -74,3 +74,9 @@ create table Localizacoes (
 	dataCadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+insert into usuarios (nome, email, senha, perfil)
+values ("Carlos Alfredo Isensee", "carlos@estok.com", "senha", "Admin");
+
+select * from usuarios
+
+
