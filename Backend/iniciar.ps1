@@ -18,7 +18,7 @@ if (-not (Test-Path -LiteralPath $python)) {
     if ($LASTEXITCODE -ne 0) { throw 'Falha ao criar o ambiente Python.' }
 }
 
-& $python -m pip --disable-pip-version-check install --quiet -r requirements-pedro.txt
+& $python -m pip --disable-pip-version-check install --quiet -r requirements.txt
 if ($LASTEXITCODE -ne 0) { throw 'Falha ao instalar as dependencias da API.' }
 
 $mysql = Get-Service MySQL80 -ErrorAction SilentlyContinue

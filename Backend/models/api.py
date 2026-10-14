@@ -4,8 +4,9 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 
-from models.pedro_comum import Conflito, NaoEncontrado
-from models import pedro_itens as itens, pedro_qrcodes as qrcodes, pedro_tarefas as tarefas_execucao
+from models import qrcodes as qrcodes, tarefa as tarefas_execucao
+from models.comum import Conflito, NaoEncontrado
+from models import item as itens
 
 
 def incluir_rotas(app: FastAPI) -> None:

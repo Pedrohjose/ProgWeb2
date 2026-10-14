@@ -10,7 +10,7 @@ def database_url(database=DB_NAME):
     return URL.create(
         "mysql+mysqlconnector",
         username=os.getenv("DB_USER", "root"),
-        password=os.getenv("DB_PASSWORD", ""),
+        password=os.getenv("DB_PASSWORD", "Senha=2709!"),
         host=os.getenv("DB_HOST", "127.0.0.1"),
         port=int(os.getenv("DB_PORT", "3306")),
         database=database,

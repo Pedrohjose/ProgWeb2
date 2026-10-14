@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Boolean, Column, Integer, String
 from sqlalchemy.orm import relationship
 from enum import Enum
 from banco import Base
@@ -20,7 +20,9 @@ class Usuario(Base):
     nome = Column(String(255), nullable=False)
     email = Column(String(255), nullable=False, unique=True)
     senha = Column(String(255), nullable=False)
-    perfil = Column(String(20), nullable=False)
+    role = Column(String(20), nullable=False, server_default='usuario')
+    is_active = Column(Boolean, nullable=False, server_default='1')
+
 
     tarefas = relationship(
         "Tarefa",

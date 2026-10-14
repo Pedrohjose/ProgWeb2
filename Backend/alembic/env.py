@@ -1,7 +1,7 @@
 from logging.config import fileConfig
 from alembic import context
 from banco import Base, engine, database_url
-import models
+#from models.item import Item
 config = context.config
 if config.config_file_name:
     fileConfig(config.config_file_name)
