@@ -1,5 +1,5 @@
 from sqlalchemy import Boolean, Column, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, synonym
 from enum import Enum
 from banco import Base
 from fastapi import APIRouter
@@ -11,6 +11,7 @@ id = 0;
 class PerfilUsuario(str, Enum):
     ADMIN = "Admin"
     FUNCIONARIO = "Funcionario"
+    SUPER_ADMIN = "Super Admin"
 
 
 class Usuario(Base):
@@ -21,6 +22,8 @@ class Usuario(Base):
     email = Column(String(255), nullable=False, unique=True)
     senha = Column(String(255), nullable=False)
     role = Column(String(20), nullable=False, server_default='usuario')
+    # O banco historicamente usa `role`; a API apresenta esse campo como `perfil`.
+    perfil = synonym("role")
     is_active = Column(Boolean, nullable=False, server_default='1')
 
 

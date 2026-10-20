@@ -1,7 +1,7 @@
 """Schemas Pydantic compartilhados pelos routers (entrada, saída e erros)."""
 from datetime import date, datetime
 from enum import Enum
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, AliasChoices, field_validator
 from models.localizacao import TipoEndereco
 from models.tarefa import StatusTarefa
 
@@ -16,7 +16,8 @@ class Erro(BaseModel):
 def respostas(*codigos):
     """Monta o bloco `responses` do Swagger para os códigos de erro informados."""
     textos = {
-        401: "Email ou senha inválidos.",
+        401: "Autenticação ausente ou credenciais inválidas ou expiradas.",
+        403: "Usuário autenticado sem permissão para esta operação.",
         404: "Recurso não encontrado.",
         409: "Conflito com dados existentes ou vínculos que impedem a operação.",
         503: "Banco indisponível ou schema incompatível.",
@@ -28,6 +29,7 @@ def respostas(*codigos):
 class Perfil(str, Enum):
     admin = "Admin"
     funcionario = "Funcionario"
+    super_admin = "Super Admin"
 
 
 class UsuarioEntrada(BaseModel):
@@ -47,7 +49,17 @@ class UsuarioSaida(BaseModel):
     id: int
     nome: str
     email: str
-    perfil: Perfil
+    perfil: Perfil = Field(validation_alias=AliasChoices("perfil", "role"))
+
+    @field_validator("perfil", mode="before")
+    @classmethod
+    def normalizar_perfil(cls, valor):
+        return {
+            "admin": "Admin",
+            "super_admin": "Super Admin",
+            "administrador": "Admin",
+            "usuario": "Funcionario",
+        }.get(str(valor).lower(), valor)
 
 
 class Login(BaseModel):
@@ -59,6 +71,21 @@ class Login(BaseModel):
 class LoginSaida(BaseModel):
     mensagem: str
     usuario: UsuarioSaida
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+    expires_in: int
+
+
+class TokenAtualizado(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+    expires_in: int
+
+
+class RefreshTokenEntrada(BaseModel):
+    refresh_token: str = Field(min_length=32, max_length=200)
 
 
 # ---------- Tarefas ----------

@@ -1,12 +1,14 @@
 """Registro isolado das rotas atribuídas a Pedro."""
 
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 
-from models import qrcodes as qrcodes, tarefa as tarefas_execucao
+from models import qrcodes as qrcodes
+from routers import tarefas_execucao
 from models.comum import Conflito, NaoEncontrado
 from models import item as itens
+from seguranca import get_current_user
 
 
 def incluir_rotas(app: FastAPI) -> None:
@@ -25,6 +27,6 @@ def incluir_rotas(app: FastAPI) -> None:
             content={"detail": "Banco indisponível ou schema incompatível."},
         )
 
-    app.include_router(itens.router)
-    app.include_router(qrcodes.router)
-    app.include_router(tarefas_execucao.router)
+    app.include_router(itens.router, dependencies=[Depends(get_current_user)])
+    app.include_router(qrcodes.router, dependencies=[Depends(get_current_user)])
+    app.include_router(tarefas_execucao.router, dependencies=[Depends(get_current_user)])

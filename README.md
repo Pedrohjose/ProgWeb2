@@ -58,7 +58,12 @@ Telas feitas:
   - [x] DELETE /localizacoes/{id}
   - [x] GET /localizacoes/{id}/itens/{all}
   - [x] GET /localizacoes/{id}/qrcode/{all}
-  
+## Autenticação e permissões
+
+Use o token de `POST /login` como `Authorization: Bearer <access_token>`. Admin e Super Admin cadastram usuários e gerenciam tarefas e localizações. Funcionario consulta localizações e executa somente as tarefas atribuídas a ele. Somente Super Admin concede esse perfil.
+
+O primeiro administrador é provisionado pelo comando local `Backend/criar_admin.py`. Veja o procedimento e as permissões em [Backend/README.md](Backend/README.md#autenticação-e-primeiro-admin).
+
 ## E assim ele ira iniciar o projeto
 
 **[Documentação Tillwind](https://tailwindcss.com/plus/ui-blocks?ref=sidebar)**

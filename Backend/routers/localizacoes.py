@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from banco import get_db
 from models import Item, Localizacao
 from schemas import ItemSaida, LocalizacaoEntrada, LocalizacaoSaida, QrCodeItem, respostas
+from seguranca import exigir_roles
 
 
 router = APIRouter(prefix="/localizacoes", tags=["Localizações"])
@@ -62,9 +63,9 @@ def consultar_localizacao(id: int, db: Session = Depends(get_db)):
     return buscar_localizacao(db, id)
 
 
-@router.post("", status_code=201, response_model=LocalizacaoSaida, responses=respostas(), summary="Cadastrar localização",
-             description="Item 16 da lista. Retorna 201 com a localização criada. CEP com 8 dígitos e estado com 2 letras (gravado em maiúsculas); tipo de endereço padrão: Entrega.")
-def criar_localizacao(dados: LocalizacaoEntrada, db: Session = Depends(get_db)):
+@router.post("", status_code=201, response_model=LocalizacaoSaida, responses=respostas(401, 403), summary="Cadastrar localização",
+             description="Exige Admin ou Super Admin. Retorna 201 com a localização criada. CEP com 8 dígitos e estado com 2 letras (gravado em maiúsculas); tipo de endereço padrão: Entrega.")
+def criar_localizacao(dados: LocalizacaoEntrada, db: Session = Depends(get_db), _admin=Depends(exigir_roles("Admin"))):
     localizacao = Localizacao()
     preencher(localizacao, dados)
     db.add(localizacao)
@@ -73,9 +74,9 @@ def criar_localizacao(dados: LocalizacaoEntrada, db: Session = Depends(get_db)):
     return localizacao
 
 
-@router.put("/{id}", response_model=LocalizacaoSaida, responses=respostas(404), summary="Atualizar localização",
-            description="Item 17 da lista. Substitui todos os campos da localização; envie o cadastro completo. ID inexistente retorna 404.")
-def atualizar_localizacao(id: int, dados: LocalizacaoEntrada, db: Session = Depends(get_db)):
+@router.put("/{id}", response_model=LocalizacaoSaida, responses=respostas(401, 403, 404), summary="Atualizar localização",
+            description="Exige Admin ou Super Admin. Substitui todos os campos da localização; envie o cadastro completo. ID inexistente retorna 404.")
+def atualizar_localizacao(id: int, dados: LocalizacaoEntrada, db: Session = Depends(get_db), _admin=Depends(exigir_roles("Admin"))):
     localizacao = buscar_localizacao(db, id)
     preencher(localizacao, dados)
     db.commit()
@@ -83,10 +84,10 @@ def atualizar_localizacao(id: int, dados: LocalizacaoEntrada, db: Session = Depe
     return localizacao
 
 
-@router.delete("/{id}", status_code=204, response_class=Response, responses=respostas(404, 409),
+@router.delete("/{id}", status_code=204, response_class=Response, responses=respostas(401, 403, 404, 409),
                summary="Excluir localização",
-               description="Item 18 da lista. Exclui definitivamente a localização e retorna 204 sem conteúdo. ID inexistente retorna 404. Localização com itens vinculados retorna 409, pois a cascata do modelo apagaria os itens do patrimônio.")
-def excluir_localizacao(id: int, db: Session = Depends(get_db)):
+               description="Exige Admin ou Super Admin. Exclui definitivamente a localização e retorna 204 sem conteúdo. ID inexistente retorna 404. Localização com itens vinculados retorna 409, pois a cascata do modelo apagaria os itens do patrimônio.")
+def excluir_localizacao(id: int, db: Session = Depends(get_db), _admin=Depends(exigir_roles("Admin"))):
     localizacao = buscar_localizacao(db, id)
     if db.scalar(select(Item.id).where(Item.id_localizacao == id).limit(1)) is not None:
         raise HTTPException(409, "Localização possui itens vinculados e não pode ser excluída.")

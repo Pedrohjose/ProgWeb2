@@ -12,14 +12,13 @@ from sqlalchemy.orm import relationship
 from banco import Base
 
 from datetime import date
-from fastapi import APIRouter, Depends, Response, status
 from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from models.item import Item
 from models.item_tarefa import ItensTarefa
-from models.comum import Conflito, NaoEncontrado, Erro, get_db
+from models.comum import Conflito, NaoEncontrado
 from models import item as itens
 
 class StatusTarefa(str, Enum):
@@ -272,63 +271,3 @@ def _svc_conferir_item(db: Session, tarefa_id: int, item_id: int) -> ItemTarefaS
     vinculo.dataConferencia = date.today()
     _repo_salvar(db, vinculo)
     return _svc__saida(item, vinculo)
-
-
-router = APIRouter(prefix="/tarefas")
-
-ERRO_404 = {404: {"model": Erro}, 503: {"model": Erro}}
-ERRO_409 = {404: {"model": Erro}, 409: {"model": Erro}, 503: {"model": Erro}}
-
-
-@router.post("/{id}/iniciar", tags=["Tarefas - Execução"], response_model=EstadoTarefa,
-             responses=ERRO_409, summary="Iniciar tarefa")
-def iniciar_tarefa(id: int, db: Session = Depends(get_db)):
-    return _svc_iniciar(db, id)
-
-
-@router.post("/{id}/concluir", tags=["Tarefas - Execução"], response_model=EstadoTarefa,
-             responses=ERRO_409, summary="Concluir tarefa")
-def concluir_tarefa(id: int, db: Session = Depends(get_db)):
-    return _svc_concluir(db, id)
-
-
-@router.get("/{id}/progresso", tags=["Tarefas - Execução"], response_model=ProgressoTarefa,
-            responses=ERRO_404, summary="Consultar progresso da tarefa")
-def progresso_tarefa(id: int, db: Session = Depends(get_db)):
-    return _svc_progresso(db, id)
-
-
-@router.get("/{id}/itens/all", tags=["Tarefas - Itens"],
-            response_model=list[ItemTarefaSaida], responses=ERRO_404,
-            summary="Listar itens da tarefa")
-def listar_itens_tarefa(id: int, db: Session = Depends(get_db)):
-    return _svc_listar_itens(db, id)
-
-
-@router.get("/{id}/itens/{itemId}", tags=["Tarefas - Itens"],
-            response_model=ItemTarefaSaida, responses=ERRO_404,
-            summary="Consultar item da tarefa")
-def obter_item_tarefa(id: int, itemId: int, db: Session = Depends(get_db)):
-    return _svc_obter_item(db, id, itemId)
-
-
-@router.post("/{id}/itens/{itemId}", tags=["Tarefas - Itens"],
-             response_model=ItemTarefaSaida, status_code=status.HTTP_201_CREATED,
-             responses=ERRO_409, summary="Adicionar item à tarefa")
-def adicionar_item_tarefa(id: int, itemId: int, db: Session = Depends(get_db)):
-    return _svc_adicionar_item(db, id, itemId)
-
-
-@router.delete("/{id}/itens/{itemId}", tags=["Tarefas - Itens"],
-               status_code=status.HTTP_204_NO_CONTENT, responses=ERRO_404,
-               summary="Remover item da tarefa")
-def remover_item_tarefa(id: int, itemId: int, db: Session = Depends(get_db)):
-    _svc_remover_item(db, id, itemId)
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-
-@router.post("/{id}/itens/{itemId}/conferir", tags=["Tarefas - Itens"],
-             response_model=ItemTarefaSaida, responses=ERRO_409,
-             summary="Conferir item da tarefa")
-def conferir_item(id: int, itemId: int, db: Session = Depends(get_db)):
-    return _svc_conferir_item(db, id, itemId)
