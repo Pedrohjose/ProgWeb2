@@ -1,60 +1,48 @@
 #!/bin/bash
-set -e  # Para o script imediatamente se qualquer comando falhar (equivalente ao $ErrorActionPreference = 'Stop')
 
-# Caminho onde o script está localizado
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
+# 1. Garante que o script pare se houver algum erro drástico
+set -e
 
-# Configuração do ambiente virtual (venv)
-VENV="$HOME/.local/share/EstokPedro/venv"
-PYTHON="$VENV/bin/python"
+# 2. Descobre a pasta onde o script está e entra nela
+cd estok/ProbWeb2
 
-# Verifica se o Python do venv existe, se não, tenta criar
-if [ ! -f "$PYTHON" ]; then
-    if command -v python3 &>/dev/null; then
-        python3 -m venv "$VENV"
-    else
-        # Fallback para o caminho do cache que você usava no Windows (adaptado para a estrutura Linux se existir)
-        BUNDLED_PYTHON="$HOME/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3"
-        if [ ! -f "$BUNDLED_PYTHON" ]; then
-            echo "Erro: Python não encontrado. Instale o python3-venv no sistema."
-            exit 1
-        fi
-        $BUNDLED_PYTHON -m venv "$VENV"
-    fi
-fi
-
-# Instala as dependências
-$PYTHON -m pip --disable-pip-version-check install --quiet -r requirements.txt
-
-# Verifica se o serviço do MySQL está rodando no Ubuntu
+echo "=== 1. Verificando Banco de Dados ==="
+# Inicia o MySQL caso esteja parado (pode pedir sua senha do Linux no terminal)
 if ! systemctl is-active --quiet mysql; then
-    echo "Erro: O serviço do MySQL está parado. Inicie-o com: sudo systemctl start mysql"
-    exit 1
-fi
+    echo "Iniciando o serviço do MySQL..."
+    sudo systemctl start mysql
+echo "MySQL pronto e rodando!"
 
-# Configuração das variáveis de ambiente do banco
+echo ""
+echo "=== 2. Ativando Ambiente Python ==="
+# Cria o venv se ele não existir na pasta atual
+python3 -m venv venv
+source venv/bin/activate
+
+echo "Verificando dependências (requirements.txt)..."
+pip install --quiet -r requirements.txt
+
+echo ""
+echo "=== 3. Configurando Banco e Inicializando API ==="
+
 export DB_NAME="estok"
 export DB_USER="root"
 export DB_HOST="127.0.0.1"
 export DB_PORT="3306"
 
-# Solicita a senha de forma segura (mascara o input)
-echo -n "Senha local do MySQL root: "
+# Pede a senha do banco de forma segura (sem exibir o que você digita)
+echo -n "Senha=2709!"
 read -s DB_PASSWORD
-echo "" # Apenas pula a linha após o enter da senha
+echo "" # Pula a linha após o Enter
 export DB_PASSWORD
 
-# Executa o teste do banco e inicia o Uvicorn
-try_run() {
-    # Tenta rodar o comando Python do SQLAlchemy
-    $PYTHON -c "from sqlalchemy import text; from banco import engine; connection = engine.connect(); connection.execute(text('SELECT 1 FROM Itens LIMIT 1')); connection.close(); print('Banco estok pronto')"
-    
-    echo "Swagger: http://127.0.0.1:8000/docs"
-    $PYTHON -m uvicorn main:app --host 127.0.0.1 --port 8000
-}
-
-# Garante que a senha será apagada da memória ao fechar o script (equivalente ao bloco 'finally')
+# Garante que a senha suma das variáveis de ambiente quando o script fechar
 trap 'unset DB_PASSWORD' EXIT
 
-try_run
+echo "Iniciando Uvicorn na porta 8000..."
+echo "Swagger disponível em: http://40.127.11.169:8000/docs"
+echo "Pressione Ctrl+C para encerrar o servidor."
+echo "------------------------------------------------"
+
+# Executa o Uvicorn (removido o 'set -e' interno para o Ctrl+C fechar graciosamente)
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
