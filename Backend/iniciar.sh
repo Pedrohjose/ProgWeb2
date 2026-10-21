@@ -3,8 +3,7 @@
 # 1. Garante que o script pare se houver algum erro drástico
 set -e
 
-# 2. Descobre a pasta onde o script está e entra nela
-cd estok/ProbWeb2
+cd estok/ProbWeb2/Backend
 
 echo "=== 1. Verificando Banco de Dados ==="
 # Inicia o MySQL caso esteja parado (pode pedir sua senha do Linux no terminal)
