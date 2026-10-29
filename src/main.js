@@ -18,7 +18,7 @@ if (form) {
     button.disabled = true;
     aviso.textContent = "Entrando...";
     try {
-      const response = await fetch("/api/login", {
+      const response = await fetch("http://40.127.11.169:8000/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, senha }),
