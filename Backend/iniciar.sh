@@ -3,8 +3,6 @@
 # 1. Garante que o script pare se houver algum erro drástico
 set -e
 
-cd estok/ProbWeb2/Backend
-
 echo "=== 1. Verificando Banco de Dados ==="
 # Inicia o MySQL caso esteja parado (pode pedir sua senha do Linux no terminal)
 if ! systemctl is-active --quiet mysql; then
@@ -24,13 +22,13 @@ pip install --quiet -r requirements.txt
 echo ""
 echo "=== 3. Configurando Banco e Inicializando API ==="
 
-export DB_NAME="estok"
+export DB_NAME="ESTOK"
 export DB_USER="root"
 export DB_HOST="127.0.0.1"
 export DB_PORT="3306"
 
 # Pede a senha do banco de forma segura (sem exibir o que você digita)
-echo -n "Senha=2709!"
+echo -n "senha123"
 read -s DB_PASSWORD
 echo "" # Pula a linha após o Enter
 export DB_PASSWORD
