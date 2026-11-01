@@ -18,7 +18,7 @@ if (form) {
     button.disabled = true;
     aviso.textContent = "Entrando...";
     try {
-      const response = await fetch(`http://40.127.11.169:8000/buscar-id/${encodeURIComponent(email)}`, {
+      const response = await fetch(`http://40.127.11.169:8000/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, senha }),
@@ -62,7 +62,6 @@ if (formForgotPassword) {
     formForgotPassword.append(aviso);
   }
 
-  // VERIFICAR EMAIL
   formForgotPassword.addEventListener("submit", async (event) => {
     event.preventDefault();
 
@@ -88,7 +87,6 @@ if (formForgotPassword) {
       aviso.className = "text-sm text-green-400";
       aviso.textContent = "E-mail encontrado! Informe sua nova senha.";
 
-      // MOSTRAR CAMPOS DE SENHA
       camposNovaSenha.classList.remove("hidden");
       camposNovaSenha.classList.add("flex");
 
@@ -148,6 +146,7 @@ if (formForgotPassword) {
 
     } finally {
       btnAlterar.disabled = false;
+      window.location.replace("/");
     }
   });
 }
