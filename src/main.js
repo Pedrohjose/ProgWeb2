@@ -63,7 +63,7 @@ if (formForgotPassword) {
 
     try {
       const response = await fetch(
-        `http://40.127.11.169:8000/buscar-id/${encodeURIComponent(email)}`
+        `http://40.127.11.169:8000/usuarios/buscarEmail/${encodeURIComponent(email)}`
       );
 
       if (!response.ok) {
