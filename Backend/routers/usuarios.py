@@ -100,7 +100,7 @@ def excluir_usuario(id: int, db: Session = Depends(get_db), _admin=Depends(exigi
         raise HTTPException(409, "Usuário possui vínculos que impedem a exclusão.")
     return Response(status_code=204)
 
-@router.get("/{email}", response_model=UsuarioSaida, responses=respostas(403, 404, 409), summary="Consultar usuário pelo email",
+@router.get("/buscarEmail/{email}", response_model=UsuarioSaida, responses=respostas(403, 404, 409), summary="Consultar usuário pelo email",
             description="Busca um usuario pelo email. Envie o email. Retorna 404 se o Email não existir")
 def verificar_email(
     email: str,
