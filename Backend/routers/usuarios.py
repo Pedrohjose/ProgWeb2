@@ -84,7 +84,6 @@ def atualizar_usuario(id: int, dados: UsuarioEntrada, db: Session = Depends(get_
     db.refresh(usuario)
     return usuario
 
-
 @router.delete("/{id}", status_code=204, response_class=Response, responses=respostas(403, 404, 409), summary="Excluir usuário",
                description="Item 12 da lista. Exclui definitivamente o usuário e retorna 204 sem conteúdo. ID inexistente retorna 404. Usuário com tarefas vinculadas retorna 409; essas tarefas precisam ser tratadas antes da exclusão.")
 def excluir_usuario(id: int, db: Session = Depends(get_db), _admin=Depends(exigir_roles("Admin"))):
@@ -100,3 +99,23 @@ def excluir_usuario(id: int, db: Session = Depends(get_db), _admin=Depends(exigi
         db.rollback()
         raise HTTPException(409, "Usuário possui vínculos que impedem a exclusão.")
     return Response(status_code=204)
+
+@router.put("/{email}", response_model=UsuarioSaida, responses=respostas(403, 404, 409), summary="Consultar usuário pelo email",
+            description="Busca um usuario pelo email. Envie o email. Retorna 404 se o Email não existir")
+def verificar_email(
+    email: str,
+    db: Session = Depends(get_db)
+):
+    usuario = db.query(Usuario).filter(
+        Usuario.email == email
+    ).first()
+
+    if not usuario:
+        raise HTTPException(404, "Email não encontrado.")
+
+    return {
+        "email": usuario.email,
+        "id": usuario.id,
+        "nome": usuario.nome,
+        "perfil": role_usuario(usuario)
+    }
