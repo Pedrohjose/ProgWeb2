@@ -46,7 +46,7 @@ if (formForgotPassword) {
     event.preventDefault();
 
     const button = document.getElementById("btnForgotPassword");
-    const emailInput = document.getElementById("emailForgotPassword");
+    const email = document.getElementById("emailForgotPassword").value;
 
     let aviso = document.getElementById("login-feedback");
 
@@ -57,8 +57,6 @@ if (formForgotPassword) {
       aviso.className = "text-sm text-red-300";
       formForgotPassword.append(aviso);
     }
-
-    const email = emailInput.value.trim();
 
     button.disabled = true;
     aviso.textContent = "Verificando e-mail...";
