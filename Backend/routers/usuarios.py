@@ -119,3 +119,27 @@ def verificar_email(
         "nome": usuario.nome,
         "perfil": role_usuario(usuario)
     }
+
+@router.put(
+    "/alterarSenha/{email}",
+    summary="Alterar senha pelo email",
+    responses=respostas(404)
+)
+def alterar_senha(
+    email: str,
+    nova_senha: str,
+    db: Session = Depends(get_db)
+):
+    usuario = db.query(Usuario).filter(
+        Usuario.email == email
+    ).first()
+
+    if not usuario:
+        raise HTTPException(404, "Email não encontrado.")
+
+    usuario.senha = hash_senha(nova_senha)
+
+    db.commit()
+    db.refresh(usuario)
+
+    return {"mensagem": "Senha alterada com sucesso!"}
