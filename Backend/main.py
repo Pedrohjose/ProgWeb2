@@ -8,6 +8,7 @@ from routers import auth, localizacoes, tarefas_gestao, usuarios
 from models.api import incluir_rotas
 from schemas import Saude, respostas
 from seguranca import get_current_user
+from fastapi.middleware.cors import CORSMiddleware
 
 DESCRICAO = """
 Documentação e testes da API do sistema de gerenciamento de patrimônio **ESTOK**.
@@ -43,6 +44,16 @@ app = FastAPI(
         {"name": "Diagnóstico", "description": "Verificação da API e da conexão com o banco; rotas auxiliares."},
     ],
     swagger_ui_parameters={"docExpansion": "list", "displayRequestDuration": True},
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://40.127.11.169:5173",
+        "http://localhost:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 incluir_rotas(app)
 
