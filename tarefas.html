@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tarefas - Estok</title><script src="https://cdn.tailwindcss.com"></script>
+<style>@media(max-width:767px){.sidebar{position:relative;width:100%}.sidebar nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}main.conteudo{margin-left:0;padding:20px}}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #818cf8;outline-offset:3px}td{overflow-wrap:anywhere;max-width:24rem}</style></head>
+<body class="bg-gray-900 text-white" data-pagina="tarefa">    <!-- Sidebar -->
+    <aside class="fixed inset-y-0 left-0 z-50 w-64 sidebar border-r border-white/10 bg-gray-950 text-white">
+
+        <!-- Logo -->
+        <div class="flex h-16 items-center border-b border-white/10 px-6">
+            <div class="flex items-center gap-3">
+
+                <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-500">
+                    <span class="font-bold">A</span>
+                </div>
+
+                <span class="text-lg font-semibold">
+                    Admin
+                </span>
+
+            </div>
+        </div>
+
+        <!-- Menu -->
+        <nav class="flex flex-col gap-1 p-4">
+
+            <!-- Dashboard -->
+            <a href="home.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-400 transition hover:bg-white/5 hover:text-white">
+
+                <img src="/icon/dashboard.svg" alt="Dashboard" class="h-5 w-5">
+
+                Dashboard
+            </a>
+
+            <!-- Usuários -->
+            <a href="usuarios.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-400 transition hover:bg-white/5 hover:text-white">
+
+                <img src="/icon/group.svg" alt="Usuários" class="h-5 w-5">
+
+                Usuários
+            </a>
+
+            <!-- Configurações -->
+            <span class="flex items-center gap-3 px-3 py-2.5 text-sm text-gray-500" title="Disponível em uma próxima etapa"><img src="/icon/settings.svg" alt="" class="h-5 w-5">Configurações · em breve</span>
+
+            <!-- Inventário -->
+            <a href="inventario.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-400 transition hover:bg-white/5 hover:text-white">
+
+                <img src="/icon/inventory.svg" alt="Inventário" class="h-5 w-5">
+
+                Inventário
+            </a>
+
+            <!-- Tarefas -->
+            <a href="tarefa.html" aria-current="page" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium bg-indigo-500/10 text-indigo-400">
+
+                <img src="/icon/task.svg" alt="Tarefas" class="h-5 w-5">
+
+                Tarefas
+            </a>
+
+            <!-- Localizações -->
+            <a href="localizacoes.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-400 transition hover:bg-white/5 hover:text-white">
+
+                <img src="/icon/location.svg" alt="Localizações" class="h-5 w-5">
+
+                Localizações
+            </a>
+
+        </nav>
+
+<div class="border-t border-white/10 p-4"><p class="text-xs text-gray-400" id="perfilSessao"></p><a class="mt-3 block text-sm text-indigo-400" href="index.html">Voltar ao login</a></div></aside>
+<main class="conteudo ml-64 min-h-screen bg-gray-900 p-8">
+<header class="mb-8 flex flex-wrap items-center justify-between gap-4"><div><h1 class="text-2xl font-bold">Tarefas</h1><p class="mt-2 text-sm text-gray-400">Consulte as tarefas cadastradas.</p></div>
+<button id="atualizar" class="rounded-lg bg-indigo-500 px-4 py-2.5 text-sm font-semibold hover:bg-indigo-600 disabled:opacity-50">Atualizar lista</button></header>
+<section aria-label="Lista de Tarefas" class="rounded-xl border border-white/10 bg-gray-950 shadow-xl">
+<div class="grid gap-4 border-b border-white/10 p-5 md:grid-cols-2"><div><label for="pesquisa" class="mb-2 block text-sm text-gray-300">Pesquisar</label><input id="pesquisa" type="search" placeholder="Título, descrição ou responsável" class="w-full rounded-lg border border-white/10 bg-gray-900 px-4 py-2.5 text-sm"></div>
+<div><label id="rotuloFiltro" for="filtro" class="mb-2 block text-sm text-gray-300">Filtrar</label><select id="filtro" class="w-full rounded-lg border border-white/10 bg-gray-900 px-4 py-2.5 text-sm"><option value="">Todos</option></select></div></div>
+<p id="aviso" role="status" aria-live="polite" class="px-6 py-4 text-sm text-gray-400">Carregando…</p>
+<a id="entrar" href="index.html" hidden class="mx-6 mb-4 inline-block text-sm text-indigo-400 underline">Entrar novamente</a>
+<div class="overflow-x-auto"><table class="w-full text-left text-sm" aria-label="Tarefas"><thead class="border-b border-white/10 bg-gray-900/50"><tr id="colunas"></tr></thead><tbody id="linhas" class="divide-y divide-white/5"></tbody></table></div>
+<footer id="contador" class="border-t border-white/10 px-6 py-4 text-sm text-gray-400">0 registros</footer></section></main>
+<script type="module" src="/src/listagens.js"></script></body></html>
