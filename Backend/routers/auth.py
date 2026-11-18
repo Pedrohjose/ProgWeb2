@@ -17,7 +17,7 @@ router = APIRouter(tags=["Autenticação"])
 
 @router.post("/login", response_model=LoginSaida, responses=respostas(401),
              summary="Validar email e senha",
-             description="Valida as credenciais e retorna token de acesso Bearer (15 min) e refresh token rotativo (7 dias).")
+                          description="Valida as credenciais e retorna token de acesso Bearer (24 horas) e refresh token rotativo (1 dia).")
 def login(dados: Login, db: Session = Depends(get_db)):
     usuario = db.scalar(select(Usuario).where(Usuario.email == dados.email))
     if usuario is None or not usuario.is_active or not verificar_senha(dados.senha, usuario.senha):
@@ -64,7 +64,7 @@ def renovar_token(dados: RefreshTokenEntrada, db: Session = Depends(get_db)):
         raise HTTPException(401, "Refresh token reutilizado. Sessão revogada.")
     novo = novo_refresh_token()
     db.add(RefreshToken(usuario_id=usuario.id, token_hash=hash_refresh_token(novo),
-                        family_id=registro.family_id, expires_at=agora + timedelta(days=REFRESH_TOKEN_DAYS)))
+                        family_id=registro.family_id, expires_at=registro.expires_at))
     access, expires_in = criar_access_token(usuario)
     db.commit()
     return {"access_token": access, "refresh_token": novo, "expires_in": expires_in}

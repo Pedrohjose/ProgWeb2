@@ -13,8 +13,8 @@ from sqlalchemy.orm import Session
 from banco import get_db
 from models import Usuario
 
-ACCESS_TOKEN_MINUTES = int(os.getenv("ACCESS_TOKEN_MINUTES", "15"))
-REFRESH_TOKEN_DAYS = int(os.getenv("REFRESH_TOKEN_DAYS", "7"))
+ACCESS_TOKEN_MINUTES = int(os.getenv("ACCESS_TOKEN_MINUTES", "1440"))
+REFRESH_TOKEN_DAYS = int(os.getenv("REFRESH_TOKEN_DAYS", "1"))
 JWT_ALGORITHM = "HS256"
 # A chave local facilita a execução acadêmica. Produção deve sempre configurar uma chave aleatória.
 JWT_SECRET = os.getenv("AUTH_SECRET_KEY", "estok-development-only-change-this-secret-key")
