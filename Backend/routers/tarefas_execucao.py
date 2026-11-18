@@ -1,10 +1,12 @@
 """Rotas de execução: funcionário atribuído executa; administradores gerenciam itens."""
 from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.orm import Session
+from pydantic import BaseModel, Field
 
+from models import item as itens
 from banco import get_db
 from models import tarefa as servicos
-from models.comum import Erro
+from models.comum import Erro, NaoEncontrado
 from permissoes_tarefas import tarefa_autorizada
 from seguranca import exigir_roles
 
@@ -12,6 +14,39 @@ router = APIRouter(prefix="/tarefas", dependencies=[Depends(tarefa_autorizada)])
 ERRO_404 = {401: {"model": Erro}, 403: {"model": Erro}, 404: {"model": Erro}, 503: {"model": Erro}}
 ERRO_409 = {**ERRO_404, 409: {"model": Erro}}
 
+class LeituraQRCode(BaseModel):
+    codigoUnico: str = Field(min_length=1, max_length=255)
+
+
+def _item_id_por_qrcode(db: Session, codigo: str) -> int:
+    item = itens._repo_buscar_por_codigo(db, codigo)
+    if item is None:
+        raise NaoEncontrado("Código não encontrado")
+    return item.id
+
+
+@router.post(
+    "/{id}/qrcode/consultar",
+    tags=["Tarefas - Itens"],
+    response_model=servicos.ItemTarefaSaida,
+    responses=ERRO_404,
+    summary="Consultar item da tarefa pelo QR Code",
+)
+def consultar_por_qrcode(id: int, dados: LeituraQRCode, db: Session = Depends(get_db)):
+    item_id = _item_id_por_qrcode(db, dados.codigoUnico)
+    return servicos._svc_obter_item(db, id, item_id)
+
+
+@router.post(
+    "/{id}/qrcode/conferir",
+    tags=["Tarefas - Itens"],
+    response_model=servicos.ItemTarefaSaida,
+    responses=ERRO_409,
+    summary="Conferir item da tarefa pelo QR Code",
+)
+def conferir_por_qrcode(id: int, dados: LeituraQRCode, db: Session = Depends(get_db)):
+    item_id = _item_id_por_qrcode(db, dados.codigoUnico)
+    return servicos._svc_conferir_item(db, id, item_id)
 
 @router.post("/{id}/iniciar", tags=["Tarefas - Execução"], response_model=servicos.EstadoTarefa,
              responses=ERRO_409, summary="Iniciar tarefa")

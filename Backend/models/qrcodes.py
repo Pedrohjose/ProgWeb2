@@ -1,6 +1,6 @@
 from io import BytesIO
 from urllib.parse import quote
-import models.qrcodes as qrcodes
+import qrcode
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -37,7 +37,7 @@ def _svc_listar(db: Session) -> list[QRCodeSaida]:
 
 def _svc__imagem(codigo: str) -> bytes:
     buffer = BytesIO()
-    qrcodes.make(codigo).save(buffer, format="PNG")
+    qrcode.make(codigo).save(buffer, format="PNG")
     return buffer.getvalue()
 
 
