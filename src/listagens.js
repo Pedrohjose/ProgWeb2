@@ -28,7 +28,7 @@ for (const [titulo] of config.colunas) {
   th.scope = 'col'; el('colunas').append(th);
 }
 el('rotuloFiltro').textContent = config.filtro;
-el('perfilSessao').textContent = sessionStorage.getItem('estok.perfil') ? `Perfil: ${perfil(sessionStorage.getItem('estok.perfil'))}` : 'Sessão não iniciada';
+el('perfilSessao').textContent = sessionStorage.getItem('estok.accessToken') && sessionStorage.getItem('estok.perfil') ? `Perfil: ${perfil(sessionStorage.getItem('estok.perfil'))}` : 'Sessão não iniciada';
 function renderizar() {
   const busca = texto(el('pesquisa').value);
   const filtro = el('filtro').value;
