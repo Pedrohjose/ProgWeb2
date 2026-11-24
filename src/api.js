@@ -6,6 +6,7 @@ function encerrarSessao() {
   sessionStorage.removeItem(ACCESS_KEY);
   sessionStorage.removeItem(REFRESH_KEY);
   sessionStorage.removeItem("estok.perfil");
+  sessionStorage.removeItem("estok.usuario");
   window.location.replace("/");
 }
 

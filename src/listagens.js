@@ -1,4 +1,5 @@
 import { listar } from './listagens-api.js';
+import { iniciarCadastros, temAcoes, acoesRegistro } from './cadastros.js';
 
 const valor = v => v === null || v === undefined || v === '' ? '—' : String(v);
 const texto = v => String(v ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
@@ -27,6 +28,10 @@ for (const [titulo] of config.colunas) {
   const th = celula('th', titulo, 'px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-400');
   th.scope = 'col'; el('colunas').append(th);
 }
+if (temAcoes()) {
+  const th = celula('th', 'Ações', 'px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-400');
+  th.scope = 'col'; el('colunas').append(th);
+}
 el('rotuloFiltro').textContent = config.filtro;
 el('perfilSessao').textContent = sessionStorage.getItem('estok.accessToken') && sessionStorage.getItem('estok.perfil') ? `Perfil: ${perfil(sessionStorage.getItem('estok.perfil'))}` : 'Sessão não iniciada';
 function renderizar() {
@@ -40,12 +45,13 @@ function renderizar() {
     for (const [, campo] of config.colunas) {
       tr.append(celula('td', typeof campo === 'function' ? campo(registro) : registro[campo], 'px-6 py-4 text-gray-300'));
     }
+    if (temAcoes()) tr.append(acoesRegistro(registro, carregar));
     el('linhas').append(tr);
   }
   if (!lista.length) {
     const tr = document.createElement('tr');
     const td = celula('td', registros.length ? 'Nenhum registro corresponde aos filtros.' : 'Nenhum registro cadastrado.', 'px-6 py-10 text-center text-gray-400');
-    td.colSpan = config.colunas.length; tr.append(td); el('linhas').append(tr);
+    td.colSpan = config.colunas.length + Number(temAcoes()); tr.append(td); el('linhas').append(tr);
   }
   el('contador').textContent = `${lista.length} de ${registros.length} registros`;
 }
@@ -93,4 +99,5 @@ async function carregar() {
 el('pesquisa').addEventListener('input', renderizar);
 el('filtro').addEventListener('change', renderizar);
 el('atualizar').addEventListener('click', carregar);
+iniciarCadastros(carregar);
 carregar();

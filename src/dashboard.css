@@ -1,0 +1,9 @@
+.estok-dashboard{background:#111827;color:#f3f4f6;color-scheme:dark}
+.estok-dashboard h1{font-size:1.75rem;line-height:1.2;font-weight:700;margin:0;letter-spacing:normal;color:#f9fafb}
+.estok-dashboard h2{font-size:1.125rem;line-height:1.4;font-weight:600;margin:0;color:#f9fafb}
+.estok-dashboard [hidden]{display:none!important}
+.dashboard-sidebar{overflow-y:auto;display:flex;flex-direction:column}
+.dashboard-conta{position:static;margin-top:auto}
+.dashboard-sidebar img{width:20px;height:20px;flex-shrink:0}
+.estok-dashboard a:focus-visible,.estok-dashboard button:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px}
+@media(max-width:767px){.dashboard-sidebar{position:relative;width:100%}.dashboard-sidebar nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.dashboard-conteudo{margin-left:0;padding:20px}}

@@ -1,5 +1,5 @@
-// Mesmo endereço utilizado pelo login original. Não usa o proxy do backend local.
-export const API_VM = 'http://40.127.11.169:8000';
+// Sem configuração local, mantém o endereço da API da VM.
+export const API_VM = import.meta.env.VITE_API_BASE_URL || 'http://40.127.11.169:8000';
 export class ErroAPI extends Error {
   constructor(message, status = 0) { super(message); this.status = status; }
 }
@@ -32,28 +32,46 @@ async function renovar() {
   }
   return renovacao;
 }
-export async function listar(path) {
+export async function solicitar(path, options = {}, formato = 'json') {
   if (!sessionStorage.getItem('estok.accessToken')) {
     throw new ErroAPI('Entre na sua conta para consultar os registros.', 401);
   }
   const enviar = () => requisitar(path, {
-    headers: { Authorization: `Bearer ${sessionStorage.getItem('estok.accessToken')}` },
+    ...options,
+    headers: { ...options.headers, Authorization: `Bearer ${sessionStorage.getItem('estok.accessToken')}` },
   });
   let response = await enviar();
   if (response.status === 401 && await renovar()) response = await enviar();
   if (!response.ok) {
     const mensagens = {
       401: 'Sua sessão expirou. Entre novamente para consultar os registros.',
-      403: 'Seu perfil não tem permissão para consultar esta lista.',
-      404: 'Esta listagem não foi encontrada na API.',
+      403: 'Seu perfil não tem permissão para realizar esta operação.',
+      404: 'O recurso solicitado não foi encontrado na API.',
       503: 'A API está disponível, mas o banco não respondeu. Tente novamente mais tarde.',
     };
-    throw new ErroAPI(mensagens[response.status] || `Não foi possível carregar a lista (HTTP ${response.status}).`, response.status);
+    let detalhe;
+    try {
+      const erro = await response.json();
+      detalhe = typeof erro.detail === 'string' ? erro.detail :
+        Array.isArray(erro.detail) ? erro.detail.map(e => `${e.loc?.slice(1).join('.') || 'Campo'}: ${e.msg}`).join('; ') : null;
+    } catch { /* Uma resposta sem JSON usa a mensagem de HTTP abaixo. */ }
+    throw new ErroAPI(detalhe || mensagens[response.status] || `Não foi possível concluir a operação (HTTP ${response.status}).`, response.status);
   }
+  if (response.status === 204) return null;
+  if (formato === 'blob') return response.blob();
   let data;
   try { data = await response.json(); } catch { throw new ErroAPI('A API retornou uma resposta inválida.'); }
+  return data;
+}
+export async function listar(path) {
+  const data = await solicitar(path);
   if (!Array.isArray(data) || data.some(item => !item || typeof item !== 'object' || Array.isArray(item))) {
     throw new ErroAPI('A API retornou um formato de lista inesperado.');
   }
   return data;
+}
+export function cadastrar(path, dados) {
+  return solicitar(path, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dados),
+  });
 }

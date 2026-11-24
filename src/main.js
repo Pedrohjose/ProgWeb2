@@ -1,4 +1,5 @@
 import './style.css'
+import { API_VM, cadastrar } from './listagens-api.js';
 
 const form = document.getElementById("form");
 if (form) {
@@ -18,7 +19,7 @@ if (form) {
     button.disabled = true;
     aviso.textContent = "Entrando...";
     try {
-      const response = await fetch(`http://40.127.11.169:8000/login`, {
+      const response = await fetch(`${API_VM}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, senha }),
@@ -28,6 +29,10 @@ if (form) {
       sessionStorage.setItem("estok.accessToken", data.access_token);
       sessionStorage.setItem("estok.refreshToken", data.refresh_token);
       sessionStorage.setItem("estok.perfil", data.usuario.perfil);
+      sessionStorage.setItem("estok.usuario", JSON.stringify({
+        id: data.usuario.id, nome: data.usuario.nome,
+        email: data.usuario.email, perfil: data.usuario.perfil,
+      }));
       window.location.replace("/home.html");
     } catch (error) {
       aviso.textContent = error instanceof TypeError
@@ -40,6 +45,31 @@ if (form) {
 }
 
 const formForgotPassword = document.getElementById("formForgotPassword");
+
+if (document.getElementById('sessao-nome')) {
+  let usuario;
+  try { usuario = JSON.parse(sessionStorage.getItem('estok.usuario')); } catch { /* Sessão antiga ou inválida. */ }
+  const conectado = Boolean(sessionStorage.getItem('estok.accessToken'));
+  const nome = conectado && usuario?.nome ? usuario.nome : 'Entre novamente';
+  document.getElementById('sessao-nome').textContent = nome;
+  document.getElementById('sessao-email').textContent = conectado ? usuario?.email || '' : '';
+  document.getElementById('sessao-perfil').textContent = conectado
+    ? (usuario?.perfil || sessionStorage.getItem('estok.perfil') || '') : 'Sessão não iniciada';
+  document.getElementById('sessao-iniciais').textContent = conectado && usuario?.nome
+    ? usuario.nome.trim().split(/\s+/).filter(Boolean).filter((_, i, partes) => i === 0 || i === partes.length - 1).map(p => p[0]).join('').toUpperCase() : '?';
+}
+
+document.getElementById('sair')?.addEventListener('click', async event => {
+  event.currentTarget.disabled = true;
+  try {
+    const refresh = sessionStorage.getItem('estok.refreshToken');
+    if (refresh) await cadastrar('/logout', { refresh_token: refresh });
+  } catch { /* Encerra a sessão local mesmo quando a API está indisponível. */ }
+  finally {
+    for (const chave of ['estok.accessToken', 'estok.refreshToken', 'estok.perfil', 'estok.usuario']) sessionStorage.removeItem(chave);
+    window.location.replace('/index.html');
+  }
+});
 
 if (formForgotPassword) {
   const button = document.getElementById("btnForgotPassword");
@@ -73,7 +103,7 @@ if (formForgotPassword) {
 
     try {
       const response = await fetch(
-        `http://40.127.11.169:8000/usuarios/buscarEmail/${encodeURIComponent(email)}`
+        `${API_VM}/usuarios/buscarEmail/${encodeURIComponent(email)}`
       );
 
       if (!response.ok) {
@@ -125,7 +155,7 @@ if (formForgotPassword) {
 
     try {
       const response = await fetch(
-        `http://40.127.11.169:8000/usuarios/alterarSenha/${encodeURIComponent(usuarioEncontrado.email)}?nova_senha=${encodeURIComponent(senha)}`,
+        `${API_VM}/usuarios/alterarSenha/${encodeURIComponent(usuarioEncontrado.email)}?nova_senha=${encodeURIComponent(senha)}`,
         {
           method: "PUT"
         }

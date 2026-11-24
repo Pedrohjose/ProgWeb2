@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
+    "test:frontend": "node --test tests/frontend-api.test.js",
     "preview": "vite preview"
   },
   "devDependencies": {
