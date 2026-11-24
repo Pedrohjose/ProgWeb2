@@ -1,3 +1,4 @@
+import './sessao.js';
 import { listar } from './listagens-api.js';
 import { iniciarCadastros, temAcoes, acoesRegistro } from './cadastros.js';
 
@@ -33,7 +34,6 @@ if (temAcoes()) {
   th.scope = 'col'; el('colunas').append(th);
 }
 el('rotuloFiltro').textContent = config.filtro;
-el('perfilSessao').textContent = sessionStorage.getItem('estok.accessToken') && sessionStorage.getItem('estok.perfil') ? `Perfil: ${perfil(sessionStorage.getItem('estok.perfil'))}` : 'Sessão não iniciada';
 function renderizar() {
   const busca = texto(el('pesquisa').value);
   const filtro = el('filtro').value;
@@ -57,7 +57,7 @@ function renderizar() {
 }
 async function carregar() {
   el('atualizar').disabled = true; el('atualizar').textContent = 'Carregando…';
-  el('entrar').hidden = true; el('linhas').replaceChildren();
+  el('linhas').replaceChildren();
   el('aviso').hidden = false; el('aviso').textContent = 'Carregando registros…';
   el('contador').textContent = 'Carregando…';
   el('pesquisa').disabled = true; el('filtro').disabled = true;
@@ -92,7 +92,6 @@ async function carregar() {
     renderizar();
   } catch (error) {
     registros = []; el('aviso').textContent = error.message;
-    el('entrar').hidden = error.status !== 401;
     el('contador').textContent = 'Lista não carregada';
   } finally { el('atualizar').disabled = false; el('atualizar').textContent = 'Atualizar lista'; }
 }

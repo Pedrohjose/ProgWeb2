@@ -93,18 +93,18 @@ function dadosFormulario(form) {
   return dados;
 }
 
-function formularioModal(titulo, salvar, atualizar, mensagem = 'Cadastro salvo com sucesso.') {
+function formularioModal(titulo, salvar, atualizar, mensagem = 'Cadastro salvo com sucesso.', rotulo = 'Salvar') {
   const modal = janela(titulo);
   const form = document.createElement('form');
   const campos = document.createElement('div'); campos.className = 'estok-form';
   const submit = document.createElement('button'); submit.type = 'submit';
-  submit.className = 'estok-botao estok-primario'; submit.textContent = 'Salvar'; submit.disabled = true;
+  submit.className = 'estok-botao estok-primario'; submit.textContent = rotulo; submit.disabled = true;
   modal.acoes.append(submit); form.append(campos, modal.aviso, modal.acoes); modal.dialog.append(form);
   let enviando = false;
   modal.dialog.addEventListener('cancel', event => { if (enviando) event.preventDefault(); });
   form.addEventListener('submit', async event => {
     event.preventDefault(); if (enviando || !form.reportValidity()) return;
-    enviando = true; submit.disabled = true; modal.fechar.disabled = true; submit.textContent = 'Salvando…'; modal.aviso.textContent = '';
+    enviando = true; submit.disabled = true; modal.fechar.disabled = true; submit.textContent = 'Processando…'; modal.aviso.textContent = '';
     try {
       await salvar(form);
       modal.dialog.close();
@@ -119,7 +119,7 @@ function formularioModal(titulo, salvar, atualizar, mensagem = 'Cadastro salvo c
     } catch (erro) {
       modal.aviso.textContent = erro.message;
     } finally {
-      enviando = false; submit.disabled = false; modal.fechar.disabled = false; submit.textContent = 'Salvar';
+      enviando = false; submit.disabled = false; modal.fechar.disabled = false; submit.textContent = rotulo;
     }
   });
   modal.aviso.textContent = 'Carregando opções…'; modal.dialog.showModal();
@@ -182,13 +182,60 @@ export function iniciarCadastros(atualizar) {
   header.append(grupo);
 }
 
-export function temAcoes() { return autenticado && (pagina === 'inventario' || (pagina === 'tarefa' && admin)); }
+function podeExcluir(registro) {
+  if (!autenticado) return false;
+  if (pagina === 'inventario') return true; // A API de itens permite usuários autenticados.
+  if (!admin) return false;
+  return pagina !== 'usuarios' || registro?.perfil !== 'Super Admin' || papel === 'Super Admin';
+}
+
+function confirmarExclusao(registro, atualizar) {
+  const recursos = { usuarios: ['usuário', '/usuarios'], inventario: ['item', '/itens'], tarefa: ['tarefa', '/tarefas'], localizacoes: ['localização', '/localizacoes'] };
+  const [tipo, endpoint] = recursos[pagina];
+  const nome = registro.nome || registro.titulo || `ID ${registro.id}`;
+  const modal = formularioModal(`Excluir ${tipo}`, () => solicitar(`${endpoint}/${registro.id}`, { method: 'DELETE' }), atualizar,
+    `${tipo[0].toUpperCase() + tipo.slice(1)} ${['tarefa', 'localização'].includes(tipo) ? 'excluída' : 'excluído'} com sucesso.`, 'Excluir definitivamente');
+  const descricao = document.createElement('p'); descricao.className = 'estok-amplo';
+  descricao.textContent = `Excluir “${nome}” (ID ${registro.id})? Esta ação é permanente. Registros com vínculos podem ter a exclusão bloqueada pela API.`;
+  modal.campos.append(descricao); modal.aviso.textContent = ''; modal.submit.disabled = false;
+  modal.submit.classList.add('estok-perigo'); modal.fechar.focus();
+}
+
+async function removerItemDaTarefa(tarefa, atualizar) {
+  const modal = formularioModal(`Remover item — ${tarefa.titulo}`, form => {
+    const itemId = new FormData(form).get('itemId');
+    return solicitar(`/tarefas/${tarefa.id}/itens/${encodeURIComponent(itemId)}`, { method: 'DELETE' });
+  }, atualizar, 'Item removido da tarefa. O patrimônio continua no inventário.', 'Remover vínculo');
+  modal.submit.classList.add('estok-perigo');
+  try {
+    const itens = await listar(`/tarefas/${tarefa.id}/itens/all`);
+    if (!modal.dialog.open) return;
+    if (!itens.length) { modal.aviso.textContent = 'Esta tarefa não possui itens vinculados.'; return; }
+    const descricao = document.createElement('p'); descricao.className = 'estok-amplo';
+    descricao.textContent = 'Confirme o item que deseja remover desta conferência. O cadastro e o QR Code do patrimônio serão preservados.';
+    modal.campos.append(descricao);
+    campo(modal.campos, 'itemId', 'Item a remover', { required: true, amplo: true, opcoes: [['', 'Selecione um item'], ...itens.map(i => [i.id, `${i.nome} — ${i.codigoUnico}`])] });
+    modal.aviso.textContent = ''; modal.submit.disabled = false;
+    modal.campos.querySelector('select').focus();
+  } catch (erro) { modal.aviso.textContent = erro.message; }
+}
+
+export function temAcoes() { return autenticado && (pagina === 'inventario' || admin); }
 export function acoesRegistro(registro, atualizar) {
   const td = document.createElement('td'); td.className = 'px-6 py-4';
-  if (pagina === 'inventario') td.append(botao('Ver QR Code', () => verQRCode(registro)));
+  const acoes = document.createElement('div'); acoes.className = 'flex flex-wrap gap-2';
+  td.append(acoes);
+  if (pagina === 'inventario') acoes.append(botao('Ver QR Code', () => verQRCode(registro)));
   if (pagina === 'tarefa' && admin) {
     const vincular = botao('Vincular item', () => vincularItem(registro, atualizar));
-    vincular.disabled = registro.status === 'Concluida'; td.append(vincular);
+    vincular.disabled = registro.status === 'Concluida'; acoes.append(vincular);
+    acoes.append(botao('Remover item da tarefa', () => removerItemDaTarefa(registro, atualizar)));
+  }
+  if (podeExcluir(registro)) {
+    const excluir = botao('Excluir', () => confirmarExclusao(registro, atualizar));
+    excluir.classList.add('estok-perigo');
+    excluir.setAttribute('aria-label', `Excluir ${registro.nome || registro.titulo || `registro ${registro.id}`}`);
+    acoes.append(excluir);
   }
   return td;
 }

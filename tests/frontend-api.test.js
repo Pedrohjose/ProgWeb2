@@ -67,6 +67,21 @@ test('logout com resposta 204 não exige JSON', async () => {
   assert.equal(await cadastrar('/logout', { refresh_token: 'refresh-antigo' }), null);
 });
 
+test('exclusão envia DELETE autenticado e aceita resposta vazia', async () => {
+  globalThis.fetch = async (url, options) => {
+    assert.equal(url, '/api/tarefas/5');
+    assert.equal(options.method, 'DELETE');
+    assert.equal(options.headers.Authorization, 'Bearer access-antigo');
+    return new Response(null, { status: 204 });
+  };
+  assert.equal(await solicitar('/tarefas/5', { method: 'DELETE' }), null);
+});
+
+test('exclusão bloqueada por vínculos mantém o erro para o formulário', async () => {
+  globalThis.fetch = async () => Response.json({ detail: 'Tarefa possui itens de conferência vinculados e não pode ser excluída.' }, { status: 409 });
+  await assert.rejects(solicitar('/tarefas/5', { method: 'DELETE' }), e => e.status === 409 && e.message.includes('vinculados'));
+});
+
 test('sem sessão não envia chamadas e listagens recusam formato inválido', async () => {
   sessionStorage.removeItem('estok.accessToken');
   globalThis.fetch = async () => { assert.fail('Não deve consultar a API sem sessão'); };

@@ -15,6 +15,8 @@
 .estok-botao:disabled{opacity:.5;cursor:wait}
 .estok-primario{background:#6366f1;border-color:#6366f1}
 .estok-primario:hover{background:#4f46e5}
+.estok-perigo{background:#7f1d1d;border-color:#b91c1c;color:#fee2e2}
+.estok-perigo:hover{background:#991b1b}
 .estok-feedback{color:#fca5a5;white-space:pre-wrap}
 .estok-qr{text-align:center}
 .estok-qr img{display:block;width:280px;max-width:100%;height:auto;margin:16px auto;background:white;border:16px solid white;image-rendering:pixelated}
