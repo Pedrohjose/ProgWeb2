@@ -1,0 +1,3 @@
+https://snack.expo.dev/@julinhachan/prog-web-2
+
+Para rodar, acesse o link e rode pelo emulador do site ou baixe o Expo GO com a sdk54 no celular e leia o QRCode no site
